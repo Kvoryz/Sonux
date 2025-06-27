@@ -1,6 +1,231 @@
 class MusicPlayer {
   constructor() {
-    this.songs = [];
+    this.songs = [
+      {
+        title: "I Wanna Be Yours (Instrumental)",
+        artist: "Arctic Monkeys",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Arctic Monkeys - I Wanna Be Yours (Instrumental).mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/am.png",
+      },
+      {
+        title: "Apocalypse",
+        artist: "CAS",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - Apocalypse.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+      },
+      {
+        title: "Cry",
+        artist: "CAS",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - Cry.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+      },
+      {
+        title: "K.",
+        artist: "CAS",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - K..mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+      },
+      {
+        title: "Sunsetz",
+        artist: "CAS",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - Sunsetz.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+      },
+      {
+        title: "Chezile",
+        artist: "Beanie",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Chezile - Beanie.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/chezile.jpeg",
+      },
+      {
+        title: "Trouble",
+        artist: "Coldplay",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Coldplay - Trouble.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cold.jpeg",
+      },
+      {
+        title: "Welcome and Goodbye",
+        artist: "Dream, Ivory",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Dream, ivory - Welcome and Goodbye.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/dream.jpeg",
+      },
+      {
+        title: "Walking Back Home",
+        artist: "FUR",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/FUR - Walking Back Home.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/fur.jpeg",
+      },
+      {
+        title: "Nina",
+        artist: "Feast",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Feast - Nina.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/feast.jpeg",
+      },
+      {
+        title: "o,Tuan",
+        artist: "Feast",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Feast - o,Tuan.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/feast.jpeg",
+      },
+      {
+        title: "Iris",
+        artist: "Goo Goo Dolls",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Goo Goo Dolls - Iris.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/goo.jpg",
+      },
+      {
+        title: "Tip Toe",
+        artist: "HYBS",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/HYBS - Tip Toe.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/hybs.jpeg",
+      },
+      {
+        title: "Drunk text",
+        artist: "Henry Moodie",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Henry Moodie - Drunk text.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/henry.jpeg",
+      },
+      {
+        title: "Car's Outside",
+        artist: "James Arthur",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/James Arthur - Car's Outside.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/james.jpeg",
+      },
+      {
+        title: "Chamber Of Reflection",
+        artist: "Mac DeMarco",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Mac DeMarco - Chamber Of Reflection.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/mac.jpg",
+      },
+      {
+        title: "Moonlight On The River",
+        artist: "Mac DeMarco",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Mac DeMarco - Moonlight On The River.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/mac.jpg",
+      },
+      {
+        title: "Teruntuk Mia",
+        artist: "Nuh..",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Music/Nuh.. - Teruntuk Mia.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/nuh.png",
+      },
+      {
+        title: "Let Down",
+        artist: "RadioHead",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/RadioHead - Let Down.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/radio.jpeg",
+      },
+      {
+        title: "Sebuah Kisah Klasik",
+        artist: "Sheila On 7",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sheila On 7 - Sebuah Kisah Klasik.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sheila.jpg",
+      },
+      {
+        title: "Dan",
+        artist: "Sheila On 7",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sheila On 7 - Dan.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sheila.jpg",
+      },
+      {
+        title: "Film Favorit",
+        artist: "Sheila On 7",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sheila on 7 - Film Favorit.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sheila.jpg",
+      },
+      {
+        title: "Back to friends",
+        artist: "Sombr",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sombr - Back to friends.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sombr.jpeg",
+      },
+      {
+        title: "Bad Habit",
+        artist: "Steve Lacy",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Music/Steve Lacy - Bad Habit.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/steve.jpg",
+      },
+      {
+        title: "Vacations",
+        artist: "Telephones",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Telephones - Vacations.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/tele.png",
+      },
+      {
+        title: "Bunga Maaf",
+        artist: "The Lantis",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/The Lantis - Bunga Maaf.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/lantis.webp",
+      },
+      {
+        title: "Perayaan mati rasa.mp3",
+        artist: "Umay, Natania",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Umay, Natania - Perayaan mati rasa.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/umay.png",
+      },
+      {
+        title: "Seasons",
+        artist: "Wave to earth",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Wave to earth - Seasons.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/wave.jpeg",
+      },
+      {
+        title: "Favorite Lesson",
+        artist: "Yaeow",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Yaeow - Favorite lesson.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/yaeow.jpeg",
+      },
+      {
+        title: "Missin Something",
+        artist: "Zach Templar",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Zach Templar - Missin something.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/zach.jpeg",
+      },
+      {
+        title: "Here With Me",
+        artist: "d4vd",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/d4vd - Here With Me.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/d4vd.jpeg",
+      },
+      {
+        title: "Romantic Homicide",
+        artist: "d4vd",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/d4vd - Romantic Homicide.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/d4vd.jpeg",
+      },
+    ];
     this.currentSongIndex = 0;
     this.isPlaying = false;
     this.isShuffled = false;
@@ -58,15 +283,13 @@ class MusicPlayer {
   }
 
   async init() {
-    await this.loadMusicFiles();
+    this.setupVisualizer();
     this.setupEventListeners();
     this.setupAudioEvents();
+    this.renderPlaylist();
+    this.updateSongDisplay();
+    this.generateShuffledIndices();
     this.initializeBackground();
-    this.setupVisualizer();
-    if (this.songs.length > 0) {
-      this.updateSongDisplay();
-      this.generateShuffledIndices();
-    }
   }
 
   setupVisualizer() {
@@ -243,234 +466,23 @@ class MusicPlayer {
     }
   }
 
-  async loadMusicFiles() {
-    try {
-      const musicFiles = [
-        {
-          file: "CAS - Apocalypse.mp3",
-          albumArt: "./image/album/cas.jpeg",
-        },
-        {
-          file: "CAS - Cry.mp3",
-          albumArt: "./image/album/cas.jpeg",
-        },
-        {
-          file: "CAS - K..mp3",
-          albumArt: "./image/album/cas.jpeg",
-        },
-        {
-          file: "CAS - Sunsetz.mp3",
-          albumArt: "./image/album/cas.jpeg",
-        },
-        {
-          file: "Chezile - Beanie.mp3",
-          albumArt: "./image/album/chezile.jpeg",
-        },
-        {
-          file: "The Lantis - Bunga Maaf.mp3",
-          albumArt: "./image/album/lantis.webp",
-        },
-        {
-          file: "James Arthur - Car's Outside.mp3",
-          albumArt: "./image/album/james.jpeg",
-        },
-        {
-          file: "Mac DeMarco - Chamber Of Reflection.mp3",
-          albumArt: "./image/album/mac.jpg",
-        },
-        {
-          file: "Mac DeMarco - Moonlight On The River.mp3",
-          albumArt: "./image/album/mac.jpg",
-        },
-        {
-          file: "Coldplay - Trouble.mp3",
-          albumArt: "./image/album/cold.jpeg",
-        },
-        {
-          file: "Coldplay - Yellow.mp3",
-          albumArt: "./image/album/cold.jpeg",
-        },
-        {
-          file: "Sombr - Back to friends.mp3",
-          albumArt: "./image/album/sombr.jpeg",
-        },
-        {
-          file: "Henry Moodie - Drunk text.mp3",
-          albumArt: "./image/album/henry.jpeg",
-        },
-        {
-          file: "Yaeow - Favorite lesson.mp3",
-          albumArt: "./image/album/yaeow.jpeg",
-        },
-        {
-          file: "d4vd - Here With Me.mp3",
-          albumArt: "./image/album/d4vd.jpeg",
-        },
-        {
-          file: "d4vd - Romantic Homicide.mp3",
-          albumArt: "./image/album/d4vd.jpeg",
-        },
-        {
-          file: "Goo Goo Dolls - Iris.mp3",
-          albumArt: "./image/album/goo.jpg",
-        },
-        {
-          file: "RadioHead - Let Down.mp3",
-          albumArt: "./image/album/radio.jpeg",
-        },
-        {
-          file: "Feast - Nina.mp3",
-          albumArt: "./image/album/feast.jpeg",
-        },
-        {
-          file: "Feast - o,Tuan.mp3",
-          albumArt: "./image/album/feast.jpeg",
-        },
-        {
-          file: "Umay, Natania - Perayaan mati rasa.mp3",
-          albumArt: "./image/album/umay.png",
-        },
-        {
-          file: "Wave to earth - Seasons.mp3",
-          albumArt: "./image/album/wave.jpeg",
-        },
-        {
-          file: "Nuh.. - Teruntuk Mia.mp3",
-          albumArt: "./image/album/nuh.png",
-        },
-        {
-          file: "HYBS - Tip Toe.mp3",
-          albumArt: "./image/album/hybs.jpeg",
-        },
-        {
-          file: "Telephones - Vacations.mp3",
-          albumArt: "./image/album/tele.png",
-        },
-        {
-          file: "FUR - Walking Back Home.mp3",
-          albumArt: "./image/album/fur.jpeg",
-        },
-        {
-          file: "Dream, ivory - Welcome and Goodbye.mp3",
-          albumArt: "./image/album/dream.jpeg",
-        },
-        {
-          file: "Zach Templar - Missin something.mp3",
-          albumArt: "./image/album/zach.jpeg",
-        },
-        {
-          file: "Steve Lacy - Bad Habit.mp3",
-          albumArt: "./image/album/steve.jpg",
-        },
-        {
-          file: "Arctic Monkeys - I Wanna Be Yours (Instrumental).mp3",
-          albumArt: "./image/album/am.png",
-        },
-        {
-          file: "Sheila on 7 - Dan.mp3",
-          albumArt: "./image/album/sheila.jpg",
-        },
-        {
-          file: "Sheila on 7 - Film Favorit.mp3",
-          albumArt: "./image/album/sheila.jpg",
-        },
-        {
-          file: "Sheila On 7 - Sebuah Kisah Klasik.mp3",
-          albumArt: "./image/album/sheila.jpg",
-        },
-      ];
-
-      this.songs = [];
-
-      for (const item of musicFiles) {
-        try {
-          const fileName = item.file;
-          const filePath = "./music/" + fileName;
-          const testAudio = new Audio();
-
-          await new Promise((resolve, reject) => {
-            testAudio.addEventListener("loadedmetadata", resolve);
-            testAudio.addEventListener("error", reject);
-            testAudio.src = filePath;
-          });
-
-          const songName = fileName.replace(/\.[^/.]+$/, "");
-          const artistName = this.extractArtistFromFilename(songName);
-
-          this.songs.push({
-            title: this.formatSongTitle(songName),
-            artist: artistName,
-            src: filePath,
-            duration: testAudio.duration,
-            fileName: fileName,
-            albumArt: item.albumArt || "./image/pfp.jpg",
-          });
-        } catch (error) {
-          console.log(`Could not load ${item.file}:`, error.message);
-        }
-      }
-
-      if (this.songs.length === 0) {
-        this.playlistContainer.innerHTML = `
-                <div class="error">
-                  No music files found in ./music/ folder.<br>
-                  Please add MP3 files to the music folder.
-                </div>
-              `;
-        return;
-      }
-
-      this.renderPlaylist();
-      console.log(`Loaded ${this.songs.length} songs:`, this.songs);
-    } catch (error) {
-      console.error("Error loading music files:", error);
-      this.playlistContainer.innerHTML = `
-              <div class="error">
-                Error loading music files.<br>
-                Make sure the music folder exists and contains audio files.
-              </div>
-            `;
-    }
-  }
-
-  extractArtistFromFilename(filename) {
-    const separators = [" - ", " _ ", "_", "-"];
-    for (const sep of separators) {
-      if (filename.includes(sep)) {
-        return filename.split(sep)[0].trim();
-      }
-    }
-    return "Unknown Artist";
-  }
-
-  formatSongTitle(filename) {
-    const separators = [" - ", " _ ", "_", "-"];
-    for (const sep of separators) {
-      if (filename.includes(sep)) {
-        return filename.split(sep).slice(1).join(sep).trim();
-      }
-    }
-    return filename
-      .replace(/[-_]/g, " ")
-      .replace(/\b\w/g, (l) => l.toUpperCase());
-  }
-
   renderPlaylist() {
     const playlistHTML = this.songs
       .map((song, index) => {
         return `
-                <div class="playlist-item ${
-                  index === this.currentSongIndex ? "active" : ""
-                }" data-index="${index}">
-                  <div class="album-art-small" style="background-image: url('${
-                    song.albumArt
-                  }')"></div>
-                  <div class="playlist-item-info">
-                    <div class="playlist-item-title">${song.title}</div>
-                    <div class="playlist-item-artist">${song.artist}</div>
+                  <div class="playlist-item ${
+                    index === this.currentSongIndex ? "active" : ""
+                  }" data-index="${index}">
+                    <div class="album-art-small" style="background-image: url('${
+                      song.albumArt
+                    }')"></div>
+                    <div class="playlist-item-info">
+                      <div class="playlist-item-title">${song.title}</div>
+                      <div class="playlist-item-artist">${song.artist}</div>
+                      <div class="playlist-item-duration">--:--</div>
+                    </div>
                   </div>
-                </div>
-              `;
+                `;
       })
       .join("");
 
@@ -490,7 +502,7 @@ class MusicPlayer {
   }
 
   formatTime(seconds) {
-    if (isNaN(seconds) || seconds === Infinity) return "0:00";
+    if (isNaN(seconds)) return "--:--";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
@@ -508,7 +520,7 @@ class MusicPlayer {
     this.albumArt.style.backgroundPosition = "center";
     this.albumArt.textContent = "";
 
-    this.durationEl.textContent = this.formatTime(song.duration);
+    this.durationEl.textContent = "--:--";
 
     this.playlistContainer
       .querySelectorAll(".playlist-item")
@@ -590,41 +602,6 @@ class MusicPlayer {
     this.isPlaying = false;
     this.playBtn.innerHTML = '<i class="fas fa-play"></i>';
     this.stopVisualizer();
-  }
-
-  async selectSong(index) {
-    if (index < 0 || index >= this.songs.length) return;
-
-    const wasPlaying = this.isPlaying;
-
-    if (this.isPlaying) {
-      this.pause();
-    }
-
-    this.currentSongIndex = index;
-    this.lastSongStartTime = Date.now();
-
-    const song = this.songs[this.currentSongIndex];
-    this.audioPlayer.src = song.src;
-    this.updateSongDisplay();
-
-    if (this.audioContext && this.audioContext.state === "suspended") {
-      await this.audioContext.resume();
-    }
-    this.setupAudioAnalysis();
-
-    if (wasPlaying) {
-      try {
-        await this.audioPlayer.play();
-        this.isPlaying = true;
-        this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        this.animateVisualizer();
-      } catch (error) {
-        console.error("Error playing audio:", error);
-      }
-    }
-    this.lastSongStartTime = Date.now();
-    this.lastSeekTime = 0;
   }
 
   prevSong() {
@@ -865,6 +842,25 @@ class MusicPlayer {
       this.updateProgress();
     });
 
+    this.audioPlayer.addEventListener("loadedmetadata", () => {
+      this.durationEl.textContent = this.formatTime(this.audioPlayer.duration);
+
+      // Update duration in playlist for current song
+      const activeItem = this.playlistContainer.querySelector(
+        ".playlist-item.active"
+      );
+      if (activeItem) {
+        const durationElement = activeItem.querySelector(
+          ".playlist-item-duration"
+        );
+        if (durationElement) {
+          durationElement.textContent = this.formatTime(
+            this.audioPlayer.duration
+          );
+        }
+      }
+    });
+
     this.audioPlayer.addEventListener("ended", () => {
       if (this.repeatMode === 1) {
         this.audioPlayer.currentTime = 0;
@@ -884,13 +880,10 @@ class MusicPlayer {
       }
     });
 
-    this.audioPlayer.addEventListener("loadedmetadata", () => {
-      this.durationEl.textContent = this.formatTime(this.audioPlayer.duration);
-    });
-
     this.audioPlayer.addEventListener("error", (e) => {
       console.error("Audio error:", e);
       this.pause();
+      this.durationEl.textContent = "0:00";
     });
   }
 

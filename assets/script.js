@@ -51,7 +51,7 @@ class MusicPlayer {
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cold.jpeg",
       },
       {
-        title: "Welcome and Goodbye",
+        title: "Welcome And Goodbye",
         artist: "Dream, Ivory",
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Dream, ivory - Welcome and Goodbye.mp3",
         albumArt:
@@ -184,7 +184,7 @@ class MusicPlayer {
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/lantis.webp",
       },
       {
-        title: "Perayaan mati rasa.mp3",
+        title: "Perayaan Mati Rasa",
         artist: "Umay, Natania",
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Umay, Natania - Perayaan mati rasa.mp3",
         albumArt:
@@ -192,7 +192,7 @@ class MusicPlayer {
       },
       {
         title: "Seasons",
-        artist: "Wave to earth",
+        artist: "Wave To Earth",
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Wave to earth - Seasons.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/wave.jpeg",
@@ -243,7 +243,6 @@ class MusicPlayer {
     this.source = null;
     this.animationId = null;
 
-    // DOM elements
     this.playBtn = document.getElementById("playBtn");
     this.prevBtn = document.getElementById("prevBtn");
     this.nextBtn = document.getElementById("nextBtn");

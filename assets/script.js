@@ -262,7 +262,6 @@ class MusicPlayer {
     this.visualizer = document.getElementById("visualizer");
     this.body = document.body;
 
-    this.backgroundChangeInterval = null;
     this.backgroundImages = [
       "./image/background.jpg",
       "./image/background2.jpg",
@@ -270,12 +269,14 @@ class MusicPlayer {
       "./image/background4.jpg",
       "./image/background5.jpg",
     ];
-    this.currentBackgroundIndex = 0;
-    this.backgroundPreloader = new Image();
+    this.previousBackgroundIndex = -1;
+    this.backgroundChangeInterval = null;
+    this.backgroundTransitionDuration = 1000;
 
     this.playlistVisible = false;
     this.playlistHovered = false;
     this.triggerHovered = false;
+    this.playlistTransitioning = false;
 
     this.init();
   }
@@ -287,7 +288,8 @@ class MusicPlayer {
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
-    this.initializeBackground();
+    this.updateBackground(false);
+    this.startBackgroundRotation();
   }
 
   setupVisualizer() {
@@ -303,6 +305,29 @@ class MusicPlayer {
     this.visualizerBars = Array.from(
       this.visualizer.querySelectorAll(".visualizer-bar")
     );
+  }
+
+  startBackgroundRotation() {
+    this.backgroundChangeInterval = setInterval(() => {
+      this.updateBackground(true);
+    }, 30000);
+  }
+
+  updateBackground(smoothTransition = true) {
+    if (this.backgroundImages.length === 0) return;
+
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * this.backgroundImages.length);
+    } while (
+      randomIndex === this.previousBackgroundIndex &&
+      this.backgroundImages.length > 1
+    );
+
+    this.previousBackgroundIndex = randomIndex;
+
+    this.backgroundBlur.style.transition = `background-image ${this.backgroundTransitionDuration}ms ease-in-out`;
+    this.backgroundBlur.style.backgroundImage = `url(${this.backgroundImages[randomIndex]})`;
   }
 
   setupAudioAnalysis() {
@@ -370,39 +395,6 @@ class MusicPlayer {
         bar.classList.remove("active");
       });
     }
-  }
-
-  async initializeBackground() {
-    if (this.backgroundImages.length > 0) {
-      this.backgroundPreloader.src = this.backgroundImages[0];
-      this.backgroundPreloader.onload = () => {
-        this.backgroundBlur.style.backgroundImage = `url(${this.backgroundImages[0]})`;
-        this.startBackgroundRotation();
-      };
-    }
-  }
-
-  startBackgroundRotation() {
-    this.updateBackground();
-    this.backgroundChangeInterval = setInterval(() => {
-      this.updateBackground();
-    }, 20000);
-  }
-
-  updateBackground() {
-    if (this.backgroundImages.length === 0) return;
-
-    const nextIndex =
-      (this.currentBackgroundIndex + 1) % this.backgroundImages.length;
-    const nextImage = new Image();
-    nextImage.src = this.backgroundImages[nextIndex];
-
-    nextImage.onload = () => {
-      this.backgroundBlur.style.backgroundImage = `url(${
-        this.backgroundImages[this.currentBackgroundIndex]
-      })`;
-      this.currentBackgroundIndex = nextIndex;
-    };
   }
 
   generateShuffledIndices() {
@@ -524,6 +516,34 @@ class MusicPlayer {
       });
   }
 
+  showPlaylist() {
+    if (this.playlistVisible || this.playlistTransitioning) return;
+
+    this.playlistTransitioning = true;
+    this.playlistVisible = true;
+    this.playlist.style.transition = "transform 0.3s ease, opacity 0.3s ease";
+    this.playlist.style.transform = "translateX(0)";
+    this.playlist.style.opacity = "1";
+
+    setTimeout(() => {
+      this.playlistTransitioning = false;
+    }, 300);
+  }
+
+  hidePlaylist() {
+    if (!this.playlistVisible || this.playlistTransitioning) return;
+
+    this.playlistTransitioning = true;
+    this.playlistVisible = false;
+    this.playlist.style.transition = "transform 0.3s ease, opacity 0.3s ease";
+    this.playlist.style.transform = "translateX(calc(100% - 20px))";
+    this.playlist.style.opacity = "0";
+
+    setTimeout(() => {
+      this.playlistTransitioning = false;
+    }, 300);
+  }
+
   async selectSong(index) {
     if (index < 0 || index >= this.songs.length) return;
 
@@ -542,6 +562,8 @@ class MusicPlayer {
     const song = this.songs[this.currentSongIndex];
     this.audioPlayer.src = song.src;
     this.updateSongDisplay();
+
+    this.updateBackground(true);
 
     if (this.audioContext && this.audioContext.state === "suspended") {
       await this.audioContext.resume();
@@ -689,15 +711,13 @@ class MusicPlayer {
 
   setupEventListeners() {
     this.playlistTrigger.addEventListener("mouseenter", () => {
-      this.playlistVisible = true;
-      this.playlistHovered = true;
+      this.showPlaylist();
     });
 
     this.playlistTrigger.addEventListener("mouseleave", () => {
-      this.playlistHovered = false;
       setTimeout(() => {
         if (!this.playlistHovered) {
-          this.playlistVisible = false;
+          this.hidePlaylist();
         }
       }, 300);
     });
@@ -708,7 +728,7 @@ class MusicPlayer {
 
     this.playlist.addEventListener("mouseleave", () => {
       this.playlistHovered = false;
-      this.playlistVisible = false;
+      this.hidePlaylist();
     });
 
     this.playBtn.addEventListener("click", () => this.togglePlay());
@@ -767,7 +787,6 @@ class MusicPlayer {
     this.audioPlayer.addEventListener("loadedmetadata", () => {
       this.durationEl.textContent = this.formatTime(this.audioPlayer.duration);
 
-      // Update duration in playlist for current song
       const activeItem = this.playlistContainer.querySelector(
         ".playlist-item.active"
       );

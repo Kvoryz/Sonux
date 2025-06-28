@@ -269,6 +269,8 @@ class MusicPlayer {
       "./image/background4.jpg",
       "./image/background5.jpg",
     ];
+    this.preloadedImages = [];
+    this.preloadBackgrounds();
     this.previousBackgroundIndex = -1;
     this.backgroundChangeInterval = null;
     this.backgroundTransitionDuration = 1000;
@@ -313,8 +315,22 @@ class MusicPlayer {
     }, 30000);
   }
 
+  preloadBackgrounds() {
+    this.backgroundImages.forEach((img) => {
+      const image = new Image();
+      image.src = img;
+      this.preloadedImages.push(image);
+    });
+  }
+
   updateBackground(smoothTransition = true) {
     if (this.backgroundImages.length === 0) return;
+
+    const availableImages = this.preloadedImages.filter((img) => img.complete);
+
+    const getImageUrl = (index) => {
+      return availableImages[index]?.src || this.backgroundImages[index];
+    };
 
     let randomIndex;
     do {
@@ -326,8 +342,20 @@ class MusicPlayer {
 
     this.previousBackgroundIndex = randomIndex;
 
-    this.backgroundBlur.style.transition = `background-image ${this.backgroundTransitionDuration}ms ease-in-out`;
-    this.backgroundBlur.style.backgroundImage = `url(${this.backgroundImages[randomIndex]})`;
+    const imgToUse = availableImages[randomIndex] || new Image();
+    const bgUrl = getImageUrl(randomIndex);
+
+    if (imgToUse.complete) {
+      this.backgroundBlur.style.transition = `background-image ${this.backgroundTransitionDuration}ms ease-in-out`;
+      this.backgroundBlur.style.backgroundImage = `url(${bgUrl})`;
+    } else {
+      const tempImg = new Image();
+      tempImg.onload = () => {
+        this.backgroundBlur.style.transition = `background-image ${this.backgroundTransitionDuration}ms ease-in-out`;
+        this.backgroundBlur.style.backgroundImage = `url(${bgUrl})`;
+      };
+      tempImg.src = bgUrl;
+    }
   }
 
   setupAudioAnalysis() {

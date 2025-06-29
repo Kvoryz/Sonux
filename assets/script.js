@@ -258,6 +258,10 @@ class MusicPlayer {
     this.backgroundBlur = document.getElementById("backgroundBlur");
     this.progress = document.getElementById("progress");
     this.progressBar = document.getElementById("progressBar");
+    this.progressTooltip = document.createElement("div");
+    this.progressTooltip.className = "progress-tooltip";
+    this.progressContainer = document.querySelector(".progress-container");
+    this.progressContainer.appendChild(this.progressTooltip);
     this.currentTimeEl = document.getElementById("currentTime");
     this.durationEl = document.getElementById("duration");
     this.playlistContainer = document.getElementById("playlistContainer");
@@ -863,6 +867,23 @@ class MusicPlayer {
         const newTime = (clickX / width) * this.audioPlayer.duration;
         this.audioPlayer.currentTime = newTime;
       }
+    });
+
+    this.progressBar.addEventListener("mousemove", (e) => {
+      if (this.audioPlayer.duration) {
+        const width = this.progressBar.offsetWidth;
+        const clickX = e.offsetX;
+        const percent = clickX / width;
+        const time = percent * this.audioPlayer.duration;
+
+        this.progressTooltip.textContent = this.formatTime(time);
+        this.progressTooltip.style.left = `${percent * 100}%`;
+        this.progressTooltip.style.opacity = "1";
+      }
+    });
+
+    this.progressBar.addEventListener("mouseleave", () => {
+      this.progressTooltip.style.opacity = "0";
     });
 
     document.addEventListener("keydown", (e) => {

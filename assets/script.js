@@ -7,6 +7,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Arctic Monkeys - I Wanna Be Yours (Instrumental).mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/am.png",
+        lyrics: [],
       },
       {
         title: "Apocalypse",
@@ -14,6 +15,30 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - Apocalypse.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+        lyrics: [
+          {
+            time: 34,
+            text: "You leapt from crumbling bridges, watching cityscapes turn to dust",
+          },
+          {
+            time: 44,
+            text: "Filming helicopters crashing in the ocean from way above",
+          },
+          { time: 54, text: "Got the music in you, baby, tell me why" },
+          { time: 60, text: "Got the music in you, baby, tell me why" },
+          {
+            time: 65,
+            text: "You've been locked in here forever, and you just can't say goodbye",
+          },
+          {
+            time: 75,
+            text: "Kisses on the foreheads of the lovers wrapped in your arms",
+          },
+          {
+            time: 84,
+            text: "You've been hiding them in hollowed-out pianos left in the dark",
+          },
+        ],
       },
       {
         title: "Cry",
@@ -21,6 +46,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - Cry.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+        lyrics: [],
       },
       {
         title: "K.",
@@ -28,6 +54,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - K..mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+        lyrics: [],
       },
       {
         title: "Sunsetz",
@@ -35,6 +62,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/CAS - Sunsetz.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
+        lyrics: [],
       },
       {
         title: "Chezile",
@@ -42,6 +70,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Chezile - Beanie.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/chezile.jpeg",
+        lyrics: [],
       },
       {
         title: "Trouble",
@@ -49,6 +78,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Coldplay - Trouble.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cold.jpeg",
+        lyrics: [],
       },
       {
         title: "Welcome And Goodbye",
@@ -56,6 +86,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Dream, ivory - Welcome and Goodbye.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/dream.jpeg",
+        lyrics: [],
       },
       {
         title: "Walking Back Home",
@@ -63,6 +94,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/FUR - Walking Back Home.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/fur.jpeg",
+        lyrics: [],
       },
       {
         title: "Nina",
@@ -70,6 +102,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Feast - Nina.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/feast.jpeg",
+        lyrics: [],
       },
       {
         title: "o,Tuan",
@@ -77,6 +110,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Feast - o,Tuan.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/feast.jpeg",
+        lyrics: [],
       },
       {
         title: "Iris",
@@ -84,6 +118,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Goo Goo Dolls - Iris.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/goo.jpg",
+        lyrics: [],
       },
       {
         title: "Tip Toe",
@@ -91,6 +126,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/HYBS - Tip Toe.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/hybs.jpeg",
+        lyrics: [],
       },
       {
         title: "Drunk text",
@@ -98,6 +134,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Henry Moodie - Drunk text.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/henry.jpeg",
+        lyrics: [],
       },
       {
         title: "Car's Outside",
@@ -105,6 +142,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/James Arthur - Car's Outside.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/james.jpeg",
+        lyrics: [],
       },
       {
         title: "Chamber Of Reflection",
@@ -112,6 +150,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Mac DeMarco - Chamber Of Reflection.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/mac.jpg",
+        lyrics: [],
       },
       {
         title: "Moonlight On The River",
@@ -119,6 +158,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Mac DeMarco - Moonlight On The River.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/mac.jpg",
+        lyrics: [],
       },
       {
         title: "Teruntuk Mia",
@@ -126,6 +166,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Nuh.. - Teruntuk Mia.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/nuh.png",
+        lyrics: [],
       },
       {
         title: "Let Down",
@@ -133,6 +174,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/RadioHead - Let Down.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/radio.jpeg",
+        lyrics: [],
       },
       {
         title: "Sebuah Kisah Klasik",
@@ -140,6 +182,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sheila On 7 - Sebuah Kisah Klasik.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sheila.jpg",
+        lyrics: [],
       },
       {
         title: "Dan",
@@ -147,6 +190,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sheila on 7 - Dan.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sheila.jpg",
+        lyrics: [],
       },
       {
         title: "Film Favorit",
@@ -154,6 +198,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sheila on 7 - Film Favorit.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sheila.jpg",
+        lyrics: [],
       },
       {
         title: "Back to friends",
@@ -161,6 +206,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Sombr - Back to friends.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/sombr.jpeg",
+        lyrics: [],
       },
       {
         title: "Bad Habit",
@@ -168,6 +214,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Steve Lacy - Bad Habit.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/steve.jpg",
+        lyrics: [],
       },
       {
         title: "Vacations",
@@ -175,6 +222,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Telephones - Vacations.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/tele.png",
+        lyrics: [],
       },
       {
         title: "Bunga Maaf",
@@ -182,6 +230,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/The Lantis - Bunga Maaf.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/lantis.webp",
+        lyrics: [],
       },
       {
         title: "Perayaan Mati Rasa",
@@ -189,6 +238,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Umay, Natania - Perayaan mati rasa.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/umay.png",
+        lyrics: [],
       },
       {
         title: "Seasons",
@@ -196,6 +246,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Wave to earth - Seasons.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/wave.jpeg",
+        lyrics: [],
       },
       {
         title: "Favorite Lesson",
@@ -203,6 +254,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Yaeow - Favorite lesson.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/yaeow.jpeg",
+        lyrics: [],
       },
       {
         title: "Missin Something",
@@ -210,6 +262,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Zach Templar - Missin something.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/zach.jpeg",
+        lyrics: [],
       },
       {
         title: "Here With Me",
@@ -217,6 +270,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/d4vd - Here With Me.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/d4vd.jpeg",
+        lyrics: [],
       },
       {
         title: "Romantic Homicide",
@@ -224,6 +278,7 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/d4vd - Romantic Homicide.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/d4vd.jpeg",
+        lyrics: [],
       },
     ];
     this.currentSongIndex = 0;
@@ -246,6 +301,8 @@ class MusicPlayer {
     this.preloadQueue = [];
     this.currentlyPreloading = 0;
     this.maxParallelPreloads = 3;
+    this.lyricsActive = false;
+    this.currentLyricIndex = 0;
 
     this.playBtn = document.getElementById("playBtn");
     this.prevBtn = document.getElementById("prevBtn");
@@ -272,6 +329,10 @@ class MusicPlayer {
       "audioPreloadContainer"
     );
     this.body = document.body;
+    this.musicPlayer = document.getElementById("musicPlayer");
+    this.lyricsContainer = document.getElementById("lyricsContainer");
+    this.lyricsContent = document.getElementById("lyricsContent");
+    this.closeLyrics = document.getElementById("closeLyrics");
 
     this.backgroundImages = [
       "./image/background.jpg",
@@ -609,6 +670,83 @@ class MusicPlayer {
       .forEach((item, index) => {
         item.classList.toggle("active", index === this.currentSongIndex);
       });
+
+    this.updateLyricsDisplay();
+  }
+
+  updateLyricsDisplay() {
+    this.lyricsContent.innerHTML = "";
+    const song = this.songs[this.currentSongIndex];
+
+    if (song.lyrics && song.lyrics.length > 0) {
+      song.lyrics.forEach((line, index) => {
+        const lyricLine = document.createElement("div");
+        lyricLine.className = "lyrics-line";
+        lyricLine.dataset.time = line.time;
+        lyricLine.dataset.index = index;
+        lyricLine.textContent = line.text;
+        this.lyricsContent.appendChild(lyricLine);
+      });
+    } else {
+      const noLyrics = document.createElement("div");
+      noLyrics.className = "lyrics-line";
+      noLyrics.textContent = "No lyrics available for this song";
+      this.lyricsContent.appendChild(noLyrics);
+    }
+
+    this.currentLyricIndex = -1;
+  }
+
+  updateActiveLyric() {
+    if (!this.lyricsActive) return;
+
+    const currentTime = this.audioPlayer.currentTime;
+    const song = this.songs[this.currentSongIndex];
+
+    if (!song.lyrics || song.lyrics.length === 0) return;
+
+    let activeIndex = -1;
+    for (let i = 0; i < song.lyrics.length; i++) {
+      if (song.lyrics[i].time <= currentTime) {
+        activeIndex = i;
+      } else {
+        break;
+      }
+    }
+
+    if (activeIndex !== this.currentLyricIndex) {
+      const allLyrics = this.lyricsContent.querySelectorAll(".lyrics-line");
+      allLyrics.forEach((lyric) => lyric.classList.remove("active"));
+
+      if (activeIndex >= 0) {
+        const currentLyric = this.lyricsContent.querySelector(
+          `.lyrics-line[data-index="${activeIndex}"]`
+        );
+        if (currentLyric) {
+          currentLyric.classList.add("active");
+
+          currentLyric.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }
+
+      this.currentLyricIndex = activeIndex;
+    }
+  }
+
+  toggleLyrics() {
+    this.lyricsActive = !this.lyricsActive;
+
+    if (this.lyricsActive) {
+      this.lyricsContainer.classList.add("active");
+      this.musicPlayer.classList.add("lyrics-active");
+      this.updateActiveLyric();
+    } else {
+      this.lyricsContainer.classList.remove("active");
+      this.musicPlayer.classList.remove("lyrics-active");
+    }
   }
 
   showPlaylist() {
@@ -886,6 +1024,10 @@ class MusicPlayer {
       this.progressTooltip.style.opacity = "0";
     });
 
+    this.albumArt.addEventListener("click", () => {
+      this.toggleLyrics();
+    });
+
     document.addEventListener("keydown", (e) => {
       switch (e.code) {
         case "Space":
@@ -910,6 +1052,9 @@ class MusicPlayer {
             this.toggleRepeat();
           }
           break;
+        case "KeyL":
+          this.toggleLyrics();
+          break;
       }
     });
   }
@@ -917,6 +1062,7 @@ class MusicPlayer {
   setupAudioEvents() {
     this.audioPlayer.addEventListener("timeupdate", () => {
       this.updateProgress();
+      this.updateActiveLyric();
     });
 
     this.audioPlayer.addEventListener("loadedmetadata", () => {

@@ -31,12 +31,40 @@ class MusicPlayer {
             text: "You've been locked in here forever, and you just can't say goodbye",
           },
           {
-            time: 75,
+            time: 76,
             text: "Kisses on the foreheads of the lovers wrapped in your arms",
           },
           {
-            time: 84,
+            time: 85,
             text: "You've been hiding them in hollowed-out pianos left in the dark",
+          },
+          {
+            time: 96,
+            text: "Got the music in you, baby, tell me why",
+          },
+          {
+            time: 101,
+            text: "Got the music in you, baby, tell me why",
+          },
+          {
+            time: 106,
+            text: "You've been locked in here forever, and you just can't say goodbye",
+          },
+          {
+            time: 116,
+            text: "Your lips, my lips",
+          },
+          {
+            time: 120,
+            text: "Apocalypse",
+          },
+          {
+            time: 128,
+            text: "Your lips, my lips",
+          },
+          {
+            time: 131,
+            text: "Apocalypse",
           },
         ],
       },
@@ -333,6 +361,7 @@ class MusicPlayer {
     this.lyricsContainer = document.getElementById("lyricsContainer");
     this.lyricsContent = document.getElementById("lyricsContent");
     this.closeLyrics = document.getElementById("closeLyrics");
+    this.lyricsBox = this.lyricsContainer.querySelector(".lyrics-box");
 
     this.backgroundImages = [
       "./image/background.jpg",
@@ -727,6 +756,11 @@ class MusicPlayer {
       if (currentLyric) {
         currentLyric.classList.add("active");
 
+        currentLyric.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
         if (activeIndex > 0) {
           const prevLyric = this.lyricsContent.querySelector(
             `.lyrics-line[data-index="${activeIndex - 1}"]`
@@ -740,11 +774,6 @@ class MusicPlayer {
           );
           nextLyric?.classList.add("active-next");
         }
-
-        currentLyric.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
       }
     }
 
@@ -755,11 +784,13 @@ class MusicPlayer {
     this.lyricsActive = !this.lyricsActive;
 
     if (this.lyricsActive) {
-      this.lyricsContainer.classList.add("active");
+      this.lyricsContainer.style.left = "0";
       this.musicPlayer.classList.add("lyrics-active");
-      this.updateActiveLyric();
+      setTimeout(() => {
+        this.updateActiveLyric();
+      }, 300);
     } else {
-      this.lyricsContainer.classList.remove("active");
+      this.lyricsContainer.style.left = "-400px";
       this.musicPlayer.classList.remove("lyrics-active");
     }
   }
@@ -1002,6 +1033,10 @@ class MusicPlayer {
       this.hidePlaylist();
     });
 
+    this.albumArt.addEventListener("click", () => {
+      this.toggleLyrics();
+    });
+
     this.playBtn.addEventListener("click", () => this.togglePlay());
     this.prevBtn.addEventListener("click", () => this.prevSong());
 
@@ -1037,10 +1072,6 @@ class MusicPlayer {
 
     this.progressBar.addEventListener("mouseleave", () => {
       this.progressTooltip.style.opacity = "0";
-    });
-
-    this.albumArt.addEventListener("click", () => {
-      this.toggleLyrics();
     });
 
     document.addEventListener("keydown", (e) => {

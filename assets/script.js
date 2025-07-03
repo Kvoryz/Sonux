@@ -17,6 +17,10 @@ class MusicPlayer {
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cas.jpeg",
         lyrics: [
           {
+            time: 2,
+            text: "♪",
+          },
+          {
             time: 34,
             text: "You leapt from crumbling bridges, watching cityscapes turn to dust",
           },
@@ -24,8 +28,14 @@ class MusicPlayer {
             time: 44,
             text: "Filming helicopters crashing in the ocean from way above",
           },
-          { time: 54, text: "Got the music in you, baby, tell me why" },
-          { time: 60, text: "Got the music in you, baby, tell me why" },
+          {
+            time: 54,
+            text: "Got the music in you, baby, tell me why",
+          },
+          {
+            time: 60,
+            text: "Got the music in you, baby, tell me why",
+          },
           {
             time: 65,
             text: "You've been locked in here forever, and you just can't say goodbye",
@@ -330,7 +340,7 @@ class MusicPlayer {
     this.currentlyPreloading = 0;
     this.maxParallelPreloads = 3;
     this.lyricsActive = false;
-    this.currentLyricIndex = 0;
+    this.currentLyricIndex = -1;
 
     this.playBtn = document.getElementById("playBtn");
     this.prevBtn = document.getElementById("prevBtn");
@@ -645,19 +655,19 @@ class MusicPlayer {
     const playlistHTML = this.songs
       .map((song, index) => {
         return `
-                  <div class="playlist-item ${
-                    index === this.currentSongIndex ? "active" : ""
-                  }" data-index="${index}">
-                    <div class="album-art-small" style="background-image: url('${
-                      song.albumArt
-                    }')"></div>
-                    <div class="playlist-item-info">
-                      <div class="playlist-item-title">${song.title}</div>
-                      <div class="playlist-item-artist">${song.artist}</div>
-                      <div class="playlist-item-duration">--:--</div>
-                    </div>
-                  </div>
-                `;
+                      <div class="playlist-item ${
+                        index === this.currentSongIndex ? "active" : ""
+                      }" data-index="${index}">
+                        <div class="album-art-small" style="background-image: url('${
+                          song.albumArt
+                        }')"></div>
+                        <div class="playlist-item-info">
+                          <div class="playlist-item-title">${song.title}</div>
+                          <div class="playlist-item-artist">${song.artist}</div>
+                          <div class="playlist-item-duration">--:--</div>
+                        </div>
+                      </div>
+                    `;
       })
       .join("");
 
@@ -735,9 +745,6 @@ class MusicPlayer {
     if (!song.lyrics || song.lyrics.length === 0) return;
 
     const allLyrics = this.lyricsContent.querySelectorAll(".lyrics-line");
-    allLyrics.forEach((lyric) => {
-      lyric.classList.remove("active", "active-prev", "active-next");
-    });
 
     let activeIndex = -1;
     for (let i = 0; i < song.lyrics.length; i++) {
@@ -748,32 +755,35 @@ class MusicPlayer {
       }
     }
 
-    if (activeIndex >= 0) {
-      const currentLyric = this.lyricsContent.querySelector(
-        `.lyrics-line[data-index="${activeIndex}"]`
-      );
+    if (activeIndex === this.currentLyricIndex) return;
 
+    allLyrics.forEach((lyric) => {
+      lyric.classList.remove("active", "active-prev", "active-next");
+    });
+
+    if (activeIndex >= 0) {
+      const currentLyric = allLyrics[activeIndex];
       if (currentLyric) {
         currentLyric.classList.add("active");
 
-        currentLyric.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-
         if (activeIndex > 0) {
-          const prevLyric = this.lyricsContent.querySelector(
-            `.lyrics-line[data-index="${activeIndex - 1}"]`
-          );
-          prevLyric?.classList.add("active-prev");
+          allLyrics[activeIndex - 1].classList.add("active-prev");
+        }
+        if (activeIndex < song.lyrics.length - 1) {
+          allLyrics[activeIndex + 1].classList.add("active-next");
         }
 
-        if (activeIndex < song.lyrics.length - 1) {
-          const nextLyric = this.lyricsContent.querySelector(
-            `.lyrics-line[data-index="${activeIndex + 1}"]`
-          );
-          nextLyric?.classList.add("active-next");
-        }
+        const lyricsBox = this.lyricsBox;
+        const lyricTop = currentLyric.offsetTop;
+        const lyricHeight = currentLyric.offsetHeight;
+        const boxHeight = lyricsBox.clientHeight;
+
+        const scrollTo = lyricTop - boxHeight / 2 + lyricHeight / 2;
+
+        lyricsBox.scrollTo({
+          top: scrollTo,
+          behavior: "smooth",
+        });
       }
     }
 
@@ -782,16 +792,33 @@ class MusicPlayer {
 
   toggleLyrics() {
     this.lyricsActive = !this.lyricsActive;
+    const lyricsContainer = this.lyricsContainer;
 
     if (this.lyricsActive) {
-      this.lyricsContainer.style.left = "0";
+      lyricsContainer.classList.add("active");
       this.musicPlayer.classList.add("lyrics-active");
+
+      void lyricsContainer.offsetWidth;
+
+      lyricsContainer.style.left = "-450px";
+      lyricsContainer.style.transform = "translateX(-100%)";
+
+      setTimeout(() => {
+        lyricsContainer.style.left = "0";
+        lyricsContainer.style.transform = "translateX(0)";
+      }, 10);
+
       setTimeout(() => {
         this.updateActiveLyric();
       }, 300);
     } else {
-      this.lyricsContainer.style.left = "-400px";
-      this.musicPlayer.classList.remove("lyrics-active");
+      lyricsContainer.style.left = "-450px";
+      lyricsContainer.style.transform = "translateX(-100%)";
+
+      setTimeout(() => {
+        lyricsContainer.classList.remove("active");
+        this.musicPlayer.classList.remove("lyrics-active");
+      }, 300);
     }
   }
 

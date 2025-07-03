@@ -7,7 +7,12 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Arctic Monkeys - I Wanna Be Yours (Instrumental).mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/am.png",
-        lyrics: [],
+        lyrics: [
+          {
+            time: 2,
+            text: "♪",
+          },
+        ],
       },
       {
         title: "Apocalypse",
@@ -21,60 +26,132 @@ class MusicPlayer {
             text: "♪",
           },
           {
-            time: 34,
+            time: 35,
             text: "You leapt from crumbling bridges, watching cityscapes turn to dust",
           },
           {
-            time: 44,
+            time: 45,
             text: "Filming helicopters crashing in the ocean from way above",
           },
           {
-            time: 54,
+            time: 56,
             text: "Got the music in you, baby, tell me why",
           },
           {
-            time: 60,
+            time: 61,
             text: "Got the music in you, baby, tell me why",
           },
           {
-            time: 65,
+            time: 66,
             text: "You've been locked in here forever, and you just can't say goodbye",
           },
           {
-            time: 76,
+            time: 77,
             text: "Kisses on the foreheads of the lovers wrapped in your arms",
           },
           {
-            time: 85,
+            time: 86,
             text: "You've been hiding them in hollowed-out pianos left in the dark",
           },
           {
-            time: 96,
+            time: 97,
             text: "Got the music in you, baby, tell me why",
           },
           {
-            time: 101,
+            time: 102,
             text: "Got the music in you, baby, tell me why",
           },
           {
-            time: 106,
+            time: 107,
             text: "You've been locked in here forever, and you just can't say goodbye",
           },
           {
-            time: 116,
+            time: 119,
             text: "Your lips, my lips",
           },
           {
-            time: 120,
+            time: 121,
             text: "Apocalypse",
           },
           {
-            time: 128,
+            time: 129,
             text: "Your lips, my lips",
           },
           {
             time: 131,
             text: "Apocalypse",
+          },
+          {
+            time: 137,
+            text: "Go and sneak us through the rivers",
+          },
+          {
+            time: 140,
+            text: "Flood is rising up on your knees",
+          },
+          {
+            time: 145,
+            text: "Oh, please",
+          },
+          {
+            time: 148,
+            text: "Come out and haunt me, I know you want me",
+          },
+          {
+            time: 153,
+            text: "Come out and haunt me",
+          },
+          {
+            time: 158,
+            text: "Sharing all your secrets with each other, since you were kids",
+          },
+          {
+            time: 167,
+            text: "Sleeping soundly with the locket that she gave you clutched in your fist",
+          },
+          {
+            time: 178,
+            text: "Got the music in you, baby, tell me why",
+          },
+          {
+            time: 183,
+            text: "Got the music in you, baby, tell me why",
+          },
+          {
+            time: 188,
+            text: "You've been locked in here forever, and you just can't say goodbye",
+          },
+          {
+            time: 195,
+            text: "♪",
+          },
+          {
+            time: 208,
+            text: "You've been locked in here forever, and you just can't say goodbye",
+          },
+          {
+            time: 215,
+            text: "♪",
+          },
+          {
+            time: 238,
+            text: "Oh, when you're all alone",
+          },
+          {
+            time: 245,
+            text: "I will reach for you",
+          },
+          {
+            time: 250,
+            text: "When you're feeling low",
+          },
+          {
+            time: 255,
+            text: "I will be there too",
+          },
+          {
+            time: 261,
+            text: "♪",
           },
         ],
       },
@@ -111,6 +188,14 @@ class MusicPlayer {
         lyrics: [],
       },
       {
+        title: "Yellow",
+        artist: "Coldplay",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Coldplay - Yellow.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/cold.jpeg",
+        lyrics: [],
+      },
+      {
         title: "Trouble",
         artist: "Coldplay",
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Coldplay - Trouble.mp3",
@@ -124,7 +209,72 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Dream, ivory - Welcome and Goodbye.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/dream.jpeg",
-        lyrics: [],
+        lyrics: [
+          {
+            time: 2,
+            text: "♪",
+          },
+          {
+            time: 43,
+            text: "Through it all once again",
+          },
+          {
+            time: 46,
+            text: "Came to know my only friend",
+          },
+          {
+            time: 49,
+            text: "Lost control",
+          },
+          {
+            time: 56,
+            text: "Can't begin, I seek within",
+          },
+          {
+            time: 59,
+            text: "To feel the warmth brought within your skin",
+          },
+          {
+            time: 63,
+            text: "Did you know?",
+          },
+          {
+            time: 69,
+            text: "For how it seemed",
+          },
+          {
+            time: 74,
+            text: "I should've stayed and let you be",
+          },
+          {
+            time: 81,
+            text: "Run into my heart so carelessly",
+          },
+          {
+            time: 88,
+            text: "That's the reason I'm afraid",
+          },
+          {
+            time: 91,
+            text: "You're the thoughts that can't be tamed",
+          },
+          {
+            time: 95,
+            text: "And I'm trying to be sane",
+          },
+          {
+            time: 102,
+            text: "And I'm trying to be sane",
+          },
+          {
+            time: 108,
+            text: "And I'm trying to be sane",
+          },
+          {
+            time: 111,
+            text: "♪",
+          },
+        ],
       },
       {
         title: "Walking Back Home",
@@ -260,7 +410,100 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Telephones - Vacations.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/tele.png",
-        lyrics: [],
+        lyrics: [
+          {
+            time: 2,
+            text: "♪",
+          },
+          {
+            time: 24,
+            text: "Rise with the morning",
+          },
+          {
+            time: 30,
+            text: "You call to me",
+          },
+          {
+            time: 37,
+            text: "My thoughts are crawling",
+          },
+          {
+            time: 42,
+            text: "You're all I see",
+          },
+          {
+            time: 47,
+            text: "I wish I could live without you",
+          },
+          {
+            time: 53,
+            text: "But you're a part of me",
+          },
+          {
+            time: 59,
+            text: "Wherever I go",
+          },
+          {
+            time: 62,
+            text: "You'll always be next to me",
+          },
+          {
+            time: 70,
+            text: "♪",
+          },
+          {
+            time: 101,
+            text: "Fall into the night",
+          },
+          {
+            time: 106,
+            text: "As I gaze into you",
+          },
+          {
+            time: 112,
+            text: "Shine so bright",
+          },
+          {
+            time: 118,
+            text: "It's all I do",
+          },
+          {
+            time: 123,
+            text: "I wish I could live without you",
+          },
+          {
+            time: 129,
+            text: "But you're a part of me",
+          },
+          {
+            time: 135,
+            text: "Wherever I go",
+          },
+          {
+            time: 138,
+            text: "You'll always be next to me",
+          },
+          {
+            time: 150,
+            text: "♪ You'll always be next to me",
+          },
+          {
+            time: 156,
+            text: "♪ You'll always be next to me",
+          },
+          {
+            time: 162,
+            text: "♪ You'll always be next to me",
+          },
+          {
+            time: 168,
+            text: "♪ You'll always be next to me",
+          },
+          {
+            time: 172,
+            text: "♪",
+          },
+        ],
       },
       {
         title: "Bunga Maaf",
@@ -316,7 +559,84 @@ class MusicPlayer {
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/d4vd - Romantic Homicide.mp3",
         albumArt:
           "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/d4vd.jpeg",
-        lyrics: [],
+        lyrics: [
+          {
+            time: 2,
+            text: "♪",
+          },
+          {
+            time: 16,
+            text: "I'm scared (oh-oh-oh)",
+          },
+          {
+            time: 21,
+            text: "It feels like you don't care (ooh-ooh)",
+          },
+          {
+            time: 29,
+            text: "Enlighten me, my dear (ooh-ooh-ooh)",
+          },
+          {
+            time: 36,
+            text: "Why am I still here? Mm (oh-oh)",
+          },
+          {
+            time: 43,
+            text: "I don't mean to be",
+          },
+          {
+            time: 45,
+            text: "Complacent with the decisions you made",
+          },
+          {
+            time: 51,
+            text: "But why? Mm",
+          },
+          {
+            time: 58,
+            text: "In the back of my mind, you died",
+          },
+          {
+            time: 65,
+            text: "And I didn't even cry",
+          },
+          {
+            time: 68,
+            text: "No, not a single tear",
+          },
+          {
+            time: 72,
+            text: "And I'm sick of waiting patiently",
+          },
+          {
+            time: 77,
+            text: "For someone that won't even arrive",
+          },
+          {
+            time: 89,
+            text: "♪ Ooh-ooh-ooh-ooh-ooh-oh",
+          },
+          {
+            time: 102,
+            text: "In the back of my mind, I killed you",
+          },
+          {
+            time: 109,
+            text: "And I didn't even regret it",
+          },
+          {
+            time: 113,
+            text: "I can't believe I said it",
+          },
+          {
+            time: 116,
+            text: "But it's true",
+          },
+          {
+            time: 124,
+            text: "I hate you",
+          },
+        ],
       },
     ];
     this.currentSongIndex = 0;

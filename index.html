@@ -78,7 +78,15 @@
     <div class="playlist-trigger" id="playlistTrigger"></div>
 
     <div class="playlist" id="playlist">
-      <h3>Playlist</h3>
+      <div class="playlist-header">
+        <h3>Playlist</h3>
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search songs..." />
+          <button id="clearSearch" class="control-btn" title="Clear search">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
       <div id="playlistContainer">
         <div class="loading">Loading music files...</div>
       </div>

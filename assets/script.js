@@ -710,6 +710,12 @@ class MusicPlayer {
     this.playlistHovered = false;
     this.triggerHovered = false;
     this.playlistTransitioning = false;
+    this.searchInput = document.getElementById("searchInput");
+    this.clearSearch = document.getElementById("clearSearch");
+    this.isSearching = false;
+    this.searchResults = [];
+    this.searchActive = false;
+    this.isTypingInSearch = false;
 
     this.init();
   }
@@ -718,6 +724,7 @@ class MusicPlayer {
     this.setupVisualizer();
     this.setupEventListeners();
     this.setupAudioEvents();
+    this.setupSearch();
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
@@ -1422,10 +1429,13 @@ class MusicPlayer {
     });
 
     document.addEventListener("keydown", (e) => {
+      if (this.isTypingInSearch) return;
+
       switch (e.code) {
         case "Space":
           e.preventDefault();
           this.togglePlay();
+          break;
           break;
         case "ArrowLeft":
           this.prevSong();
@@ -1444,9 +1454,6 @@ class MusicPlayer {
             e.preventDefault();
             this.toggleRepeat();
           }
-          break;
-        case "KeyL":
-          this.toggleLyrics();
           break;
       }
     });
@@ -1500,6 +1507,98 @@ class MusicPlayer {
       this.pause();
       this.durationEl.textContent = "0:00";
     });
+  }
+
+  setupSearch() {
+    this.searchInput.addEventListener("input", (e) => {
+      this.filterSongs(e.target.value);
+    });
+
+    this.searchInput.addEventListener("keydown", (e) => {
+      this.isTypingInSearch = true;
+
+      if (e.code === "Space") {
+        e.stopPropagation();
+      }
+
+      if (e.key === "Escape") {
+        this.searchInput.value = "";
+        this.filterSongs("");
+      }
+    });
+
+    this.searchInput.addEventListener("keyup", () => {
+      this.isTypingInSearch = false;
+    });
+
+    this.clearSearch.addEventListener("click", () => {
+      this.searchInput.value = "";
+      this.filterSongs("");
+      this.searchInput.focus();
+    });
+  }
+
+  filterSongs(searchTerm) {
+    const term = searchTerm.toLowerCase().trim();
+
+    if (term === "") {
+      this.isSearching = false;
+      this.renderPlaylist();
+      return;
+    }
+
+    this.isSearching = true;
+    this.searchResults = this.songs.filter((song) => {
+      return song.title.toLowerCase().includes(term);
+    });
+
+    this.renderFilteredPlaylist();
+  }
+
+  renderFilteredPlaylist() {
+    if (this.searchResults.length === 0) {
+      this.playlistContainer.innerHTML = `
+                  <div class="no-results">
+                    No songs found
+                  </div>
+                `;
+      return;
+    }
+
+    const playlistHTML = this.searchResults
+      .map((song) => {
+        const index = this.songs.findIndex(
+          (s) => s.title === song.title && s.artist === song.artist
+        );
+        return `
+                <div class="playlist-item ${
+                  index === this.currentSongIndex ? "active" : ""
+                }" data-index="${index}">
+                  <div class="album-art-small" style="background-image: url('${
+                    song.albumArt
+                  }')"></div>
+                  <div class="playlist-item-info">
+                    <div class="playlist-item-title">${song.title}</div>
+                    <div class="playlist-item-artist">${song.artist}</div>
+                    <div class="playlist-item-duration">--:--</div>
+                  </div>
+                </div>
+              `;
+      })
+      .join("");
+
+    this.playlistContainer.innerHTML = playlistHTML;
+
+    this.playlistContainer
+      .querySelectorAll(".playlist-item")
+      .forEach((item) => {
+        item.addEventListener("click", (e) => {
+          const index = parseInt(e.currentTarget.dataset.index);
+          this.selectSong(index);
+          this.searchInput.value = "";
+          this.filterSongs("");
+        });
+      });
   }
 
   destroy() {

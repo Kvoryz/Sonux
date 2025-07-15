@@ -266,7 +266,8 @@ class MusicPlayer {
         lyricsKey: "romantic_homicide",
       },
     ];
-    this.currentSongIndex = Math.floor(Math.random() * this.songs.length);
+
+    this.currentSongIndex = 0;
     this.isPlaying = false;
     this.isShuffled = false;
     this.isNextButtonPressed = false;
@@ -276,19 +277,20 @@ class MusicPlayer {
     this.repeatMode = 0;
     this.shuffledIndices = [];
     this.currentShuffleIndex = 0;
-    this.audioPlayer = document.getElementById("audioPlayer");
-    this.audioContext = null;
-    this.analyser = null;
-    this.dataArray = null;
-    this.source = null;
-    this.animationId = null;
-    this.preloadedAudios = {};
-    this.preloadQueue = [];
-    this.currentlyPreloading = 0;
-    this.maxParallelPreloads = 3;
     this.lyricsActive = false;
     this.currentLyricIndex = -1;
 
+    this.maxParallelPreloads = 3;
+    this.preloadRetryLimit = 2;
+    this.preloadRetryDelay = 2000;
+    this.preloadBufferSize = 5;
+    this.preloadQueue = [];
+    this.preloadedAudios = {};
+    this.currentlyPreloading = 0;
+    this.preloadAttempts = {};
+    this.preloadPriorities = [];
+
+    this.audioPlayer = document.getElementById("audioPlayer");
     this.playBtn = document.getElementById("playBtn");
     this.prevBtn = document.getElementById("prevBtn");
     this.nextBtn = document.getElementById("nextBtn");
@@ -300,10 +302,6 @@ class MusicPlayer {
     this.backgroundBlur = document.getElementById("backgroundBlur");
     this.progress = document.getElementById("progress");
     this.progressBar = document.getElementById("progressBar");
-    this.progressTooltip = document.createElement("div");
-    this.progressTooltip.className = "progress-tooltip";
-    this.progressContainer = document.querySelector(".progress-container");
-    this.progressContainer.appendChild(this.progressTooltip);
     this.currentTimeEl = document.getElementById("currentTime");
     this.durationEl = document.getElementById("duration");
     this.playlistContainer = document.getElementById("playlistContainer");
@@ -313,12 +311,16 @@ class MusicPlayer {
     this.audioPreloadContainer = document.getElementById(
       "audioPreloadContainer"
     );
-    this.body = document.body;
-    this.musicPlayer = document.getElementById("musicPlayer");
     this.lyricsContainer = document.getElementById("lyricsContainer");
     this.lyricsContent = document.getElementById("lyricsContent");
-    this.closeLyrics = document.getElementById("closeLyrics");
-    this.lyricsBox = this.lyricsContainer.querySelector(".lyrics-box");
+    this.searchInput = document.getElementById("searchInput");
+    this.clearSearch = document.getElementById("clearSearch");
+
+    this.audioContext = null;
+    this.analyser = null;
+    this.dataArray = null;
+    this.source = null;
+    this.animationId = null;
 
     this.backgroundImages = [
       "./image/background.jpg",
@@ -328,7 +330,6 @@ class MusicPlayer {
       "./image/background5.jpg",
     ];
     this.preloadedImages = [];
-    this.preloadBackgrounds();
     this.previousBackgroundIndex = -1;
     this.backgroundChangeInterval = null;
     this.backgroundTransitionDuration = 1000;
@@ -337,8 +338,6 @@ class MusicPlayer {
     this.playlistHovered = false;
     this.triggerHovered = false;
     this.playlistTransitioning = false;
-    this.searchInput = document.getElementById("searchInput");
-    this.clearSearch = document.getElementById("clearSearch");
     this.isSearching = false;
     this.searchResults = [];
     this.searchActive = false;
@@ -347,7 +346,7 @@ class MusicPlayer {
     this.init();
   }
 
-  async init() {
+  init() {
     this.setupVisualizer();
     this.setupEventListeners();
     this.setupAudioEvents();
@@ -355,22 +354,41 @@ class MusicPlayer {
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
-    this.currentShuffleIndex = this.shuffledIndices.indexOf(
-      this.currentSongIndex
-    );
     this.updateBackground(false);
     this.startBackgroundRotation();
     this.startPreloading();
   }
 
   startPreloading() {
-    const initialPreloadCount = Math.min(5, this.songs.length);
-    for (let i = 0; i < initialPreloadCount; i++) {
-      this.preloadAudio(i);
+    this.clearPreloads();
+    this.preloadAttempts = {};
+
+    if (!this.preloadedAudios[this.currentSongIndex]) {
+      this.preloadPriorities.push(this.currentSongIndex);
     }
 
-    for (let i = initialPreloadCount; i < this.songs.length; i++) {
-      this.preloadQueue.push(i);
+    for (let i = 1; i <= this.preloadBufferSize; i++) {
+      const nextIndex = (this.currentSongIndex + i) % this.songs.length;
+      if (!this.preloadedAudios[nextIndex]) {
+        this.preloadPriorities.push(nextIndex);
+      }
+    }
+
+    for (let i = 1; i <= this.preloadBufferSize; i++) {
+      const prevIndex =
+        (this.currentSongIndex - i + this.songs.length) % this.songs.length;
+      if (
+        !this.preloadedAudios[prevIndex] &&
+        !this.preloadPriorities.includes(prevIndex)
+      ) {
+        this.preloadPriorities.push(prevIndex);
+      }
+    }
+
+    for (let i = 0; i < this.songs.length; i++) {
+      if (!this.preloadedAudios[i] && !this.preloadPriorities.includes(i)) {
+        this.preloadPriorities.push(i);
+      }
     }
 
     this.processPreloadQueue();
@@ -378,10 +396,10 @@ class MusicPlayer {
 
   processPreloadQueue() {
     while (
-      this.preloadQueue.length > 0 &&
+      this.preloadPriorities.length > 0 &&
       this.currentlyPreloading < this.maxParallelPreloads
     ) {
-      const index = this.preloadQueue.shift();
+      const index = this.preloadPriorities.shift();
       this.preloadAudio(index);
     }
   }
@@ -389,17 +407,28 @@ class MusicPlayer {
   preloadAudio(index) {
     if (this.preloadedAudios[index]) return;
 
+    if (!this.preloadAttempts[index]) {
+      this.preloadAttempts[index] = 0;
+    }
+
+    if (this.preloadAttempts[index] >= this.preloadRetryLimit) {
+      console.warn(`Max preload attempts reached for song ${index}`);
+      return;
+    }
+
+    this.preloadAttempts[index]++;
     this.currentlyPreloading++;
+
     const song = this.songs[index];
     const audio = document.createElement("audio");
     audio.preload = "auto";
     audio.src = song.src;
     audio.crossOrigin = "anonymous";
+    audio.dataset.songIndex = index;
 
-    audio.oncanplaythrough = () => {
+    const onLoadSuccess = () => {
       this.preloadedAudios[index] = audio;
       this.currentlyPreloading--;
-      this.processPreloadQueue();
 
       const playlistItem = this.playlistContainer.querySelector(
         `.playlist-item[data-index="${index}"]`
@@ -407,15 +436,87 @@ class MusicPlayer {
       if (playlistItem) {
         playlistItem.classList.add("preloaded");
       }
-    };
 
-    audio.onerror = () => {
-      console.error(`Failed to preload song: ${song.title}`);
-      this.currentlyPreloading--;
       this.processPreloadQueue();
     };
 
+    const onLoadError = () => {
+      console.error(
+        `Failed to preload song: ${song.title} (attempt ${this.preloadAttempts[index]})`
+      );
+      this.currentlyPreloading--;
+      audio.remove();
+
+      if (this.preloadAttempts[index] < this.preloadRetryLimit) {
+        setTimeout(() => {
+          this.preloadAudio(index);
+        }, this.preloadRetryDelay);
+      } else {
+        this.processPreloadQueue();
+      }
+    };
+
+    audio.oncanplaythrough = onLoadSuccess;
+    audio.onerror = onLoadError;
+    audio.onabort = onLoadError;
+
+    const loadTimeout = setTimeout(() => {
+      if (!audio.readyState) {
+        console.warn(`Preload timeout for song ${index}`);
+        audio.src = "";
+        onLoadError();
+      }
+    }, 15000);
+
+    audio.onloadeddata = () => clearTimeout(loadTimeout);
+
     this.audioPreloadContainer.appendChild(audio);
+  }
+
+  clearPreloads() {
+    Object.values(this.preloadedAudios).forEach((audio) => {
+      audio.src = "";
+      audio.remove();
+    });
+
+    this.preloadedAudios = {};
+    this.currentlyPreloading = 0;
+    this.preloadPriorities = [];
+
+    document.querySelectorAll(".playlist-item.preloaded").forEach((item) => {
+      item.classList.remove("preloaded");
+    });
+  }
+
+  updatePreloadPriorities(currentIndex) {
+    const newPriorities = [];
+
+    for (let i = 1; i <= this.preloadBufferSize; i++) {
+      const nextIndex = (currentIndex + i) % this.songs.length;
+      if (!this.preloadedAudios[nextIndex]) {
+        newPriorities.push(nextIndex);
+      }
+    }
+
+    for (let i = 1; i <= this.preloadBufferSize; i++) {
+      const prevIndex =
+        (currentIndex - i + this.songs.length) % this.songs.length;
+      if (
+        !this.preloadedAudios[prevIndex] &&
+        !newPriorities.includes(prevIndex)
+      ) {
+        newPriorities.push(prevIndex);
+      }
+    }
+
+    for (let i = 0; i < this.songs.length; i++) {
+      if (!this.preloadedAudios[i] && !newPriorities.includes(i)) {
+        newPriorities.push(i);
+      }
+    }
+
+    this.preloadPriorities = newPriorities;
+    this.processPreloadQueue();
   }
 
   setupVisualizer() {
@@ -811,7 +912,7 @@ class MusicPlayer {
     }, 300);
   }
 
-  async selectSong(index) {
+  selectSong(index) {
     if (index < 0 || index >= this.songs.length) return;
 
     const wasPlaying = this.isPlaying;
@@ -838,24 +939,25 @@ class MusicPlayer {
 
     this.updateSongDisplay();
     this.updateBackground(true);
+    this.updatePreloadPriorities(index);
 
     if (this.audioContext && this.audioContext.state === "suspended") {
-      await this.audioContext.resume();
+      this.audioContext.resume();
     }
     this.setupAudioAnalysis();
 
     if (wasPlaying) {
-      try {
-        await this.audioPlayer.play();
-        this.isPlaying = true;
-        this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        this.animateVisualizer();
-      } catch (error) {
-        console.error("Error playing audio:", error);
-      }
+      this.audioPlayer
+        .play()
+        .then(() => {
+          this.isPlaying = true;
+          this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          this.animateVisualizer();
+        })
+        .catch((error) => {
+          console.error("Error playing audio:", error);
+        });
     }
-
-    this.preloadAdjacentSongs(index);
   }
 
   preloadAdjacentSongs(currentIndex) {
@@ -1234,6 +1336,7 @@ class MusicPlayer {
         });
       });
   }
+
   destroy() {
     if (this.backgroundChangeInterval) {
       clearInterval(this.backgroundChangeInterval);
@@ -1242,6 +1345,7 @@ class MusicPlayer {
     if (this.audioContext) {
       this.audioContext.close();
     }
+    this.clearPreloads();
   }
 }
 

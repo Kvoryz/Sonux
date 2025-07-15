@@ -266,7 +266,7 @@ class MusicPlayer {
         lyricsKey: "romantic_homicide",
       },
     ];
-    this.currentSongIndex = 0;
+    this.currentSongIndex = Math.floor(Math.random() * this.songs.length);
     this.isPlaying = false;
     this.isShuffled = false;
     this.isNextButtonPressed = false;
@@ -355,6 +355,9 @@ class MusicPlayer {
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
+    this.currentShuffleIndex = this.shuffledIndices.indexOf(
+      this.currentSongIndex
+    );
     this.updateBackground(false);
     this.startBackgroundRotation();
     this.startPreloading();

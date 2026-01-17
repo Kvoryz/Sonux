@@ -32,13 +32,30 @@
     <div class="music-player" id="musicPlayer">
       <div class="song-info">
         <div class="album-art" id="albumArt"></div>
-        <div class="song-details">
-          <div class="song-title" id="songTitle">Select a song</div>
-          <div class="artist-name" id="artistName">No artist</div>
+        <div class="song-header">
+          <div class="song-details">
+            <div class="song-title" id="songTitle">Select a song</div>
+            <div class="artist-name" id="artistName">No artist</div>
+          </div>
+          <button
+            class="favorite-btn"
+            id="favoriteBtn"
+            title="Add to Favorites"
+          >
+            <i class="far fa-heart"></i>
+          </button>
         </div>
       </div>
 
-      <div class="visualizer-container" id="visualizer"></div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar">
+          <div class="progress" id="progress"></div>
+        </div>
+        <div class="time-info">
+          <span id="currentTime">0:00</span>
+          <span id="duration">--:--</span>
+        </div>
+      </div>
 
       <div class="controls">
         <button class="control-btn" id="shuffleBtn" title="Shuffle">
@@ -57,68 +74,55 @@
           <i class="fas fa-repeat"></i>
         </button>
       </div>
-
-      <div class="progress-container">
-        <div class="progress-bar" id="progressBar">
-          <div class="progress" id="progress"></div>
-        </div>
-        <div class="time-info">
-          <span id="currentTime">0:00</span>
-          <span id="duration">--:--</span>
-        </div>
-      </div>
     </div>
 
-    <!-- Bottom Left Controls -->
-    <div class="bottom-left-controls">
-      <!-- Background Switcher -->
-      <div class="bg-switcher-wrapper">
-        <button
-          class="control-btn small"
-          id="bgSwitcherBtn"
-          title="Background Mode"
-        >
-          <i class="fas fa-image"></i>
+    <!-- FAB Menu -->
+    <div class="fab-container" id="fabContainer">
+      <div class="fab-menu" id="fabMenu">
+        <!-- Stats Button -->
+        <button class="fab-item" id="statsBtn" title="Stats">
+          <i class="fas fa-chart-bar"></i>
         </button>
-        <div class="bg-switcher-menu" id="bgSwitcherMenu">
-          <div class="bg-switcher-option active" data-mode="rotation">
-            <i class="fas fa-images"></i> Rotation
+
+        <!-- Download Button -->
+        <button class="fab-item" id="downloadBtn" title="Download Song">
+          <i class="fas fa-download"></i>
+        </button>
+
+        <!-- Sleep Timer -->
+        <div class="fab-item-wrapper">
+          <button class="fab-item" id="sleepTimerBtn" title="Sleep Timer">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="sleep-timer-menu" id="sleepTimerMenu">
+            <div class="sleep-timer-option" data-minutes="15">15 min</div>
+            <div class="sleep-timer-option" data-minutes="30">30 min</div>
+            <div class="sleep-timer-option" data-minutes="45">45 min</div>
+            <div class="sleep-timer-option" data-minutes="60">60 min</div>
+            <div class="sleep-timer-option cancel" data-minutes="0">Cancel</div>
           </div>
-          <div class="bg-switcher-option" data-mode="album">
-            <i class="fas fa-compact-disc"></i> Album Art
+          <span class="sleep-timer-display" id="sleepTimerDisplay"></span>
+        </div>
+
+        <!-- Background Switcher -->
+        <div class="fab-item-wrapper">
+          <button class="fab-item" id="bgSwitcherBtn" title="Background Mode">
+            <i class="fas fa-image"></i>
+          </button>
+          <div class="bg-switcher-menu" id="bgSwitcherMenu">
+            <div class="bg-switcher-option active" data-mode="rotation">
+              <i class="fas fa-images"></i> Rotation
+            </div>
+            <div class="bg-switcher-option" data-mode="album">
+              <i class="fas fa-compact-disc"></i> Album Art
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Sleep Timer -->
-      <div class="sleep-timer-wrapper">
-        <button
-          class="control-btn small"
-          id="sleepTimerBtn"
-          title="Sleep Timer"
-        >
-          <i class="fas fa-moon"></i>
-        </button>
-        <div class="sleep-timer-menu" id="sleepTimerMenu">
-          <div class="sleep-timer-option" data-minutes="15">15 min</div>
-          <div class="sleep-timer-option" data-minutes="30">30 min</div>
-          <div class="sleep-timer-option" data-minutes="45">45 min</div>
-          <div class="sleep-timer-option" data-minutes="60">60 min</div>
-          <div class="sleep-timer-option cancel" data-minutes="0">
-            Cancel Timer
-          </div>
-        </div>
-        <span class="sleep-timer-display" id="sleepTimerDisplay"></span>
-      </div>
-
-      <!-- Download Button -->
-      <button class="control-btn small" id="downloadBtn" title="Download Song">
-        <i class="fas fa-download"></i>
-      </button>
-
-      <!-- Stats Button -->
-      <button class="control-btn small" id="statsBtn" title="Stats">
-        <i class="fas fa-chart-bar"></i>
+      <!-- Main FAB Toggle -->
+      <button class="fab-toggle" id="fabToggle" title="Menu">
+        <i class="fas fa-ellipsis-v"></i>
       </button>
     </div>
 

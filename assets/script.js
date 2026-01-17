@@ -286,10 +286,7 @@ class MusicPlayer {
     this.currentShuffleIndex = 0;
     this.audioPlayer = document.getElementById("audioPlayer");
     this.audioContext = null;
-    this.analyser = null;
-    this.dataArray = null;
     this.source = null;
-    this.animationId = null;
     this.lyricsActive = false;
     this.currentLyricIndex = -1;
 
@@ -327,7 +324,6 @@ class MusicPlayer {
     this.playlistContainer = document.getElementById("playlistContainer");
     this.playlist = document.getElementById("playlist");
     this.playlistTrigger = document.getElementById("playlistTrigger");
-    this.visualizer = document.getElementById("visualizer");
     this.audioPreloadContainer = document.getElementById(
       "audioPreloadContainer",
     );
@@ -356,6 +352,9 @@ class MusicPlayer {
       totalPlays: 0,
       songPlayCounts: {},
     });
+
+    this.favoriteBtn = document.getElementById("favoriteBtn");
+    this.favorites = this.loadFromStorage("harmony_favorites", []);
 
     this.nextAudioPreload = null;
 
@@ -403,7 +402,6 @@ class MusicPlayer {
   }
 
   async init() {
-    this.setupVisualizer();
     this.setupEventListeners();
     this.setupAudioEvents();
     this.setupSearch();
@@ -412,6 +410,8 @@ class MusicPlayer {
     this.setupBackgroundSwitcher();
     this.setupDownload();
     this.setupStats();
+    this.setupFavorites();
+    this.setupFAB();
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
@@ -741,23 +741,6 @@ class MusicPlayer {
     this.processPreloadQueue();
   }
 
-  setupVisualizer() {
-    if (!this.visualizer) return;
-
-    this.visualizer.innerHTML = "";
-    const barCount = 32;
-    for (let i = 0; i < barCount; i++) {
-      const bar = document.createElement("div");
-      bar.className = "visualizer-bar";
-      bar.style.height = `${Math.random() * 20 + 2}px`;
-      this.visualizer.appendChild(bar);
-    }
-
-    this.visualizerBars = Array.from(
-      this.visualizer.querySelectorAll(".visualizer-bar"),
-    );
-  }
-
   startBackgroundRotation() {
     if (this.backgroundMode !== "rotation") return;
 
@@ -966,66 +949,10 @@ class MusicPlayer {
       this.audioContext = new (
         window.AudioContext || window.webkitAudioContext
       )();
-      this.analyser = this.audioContext.createAnalyser();
-      this.analyser.fftSize = 256;
       this.source = this.audioContext.createMediaElementSource(
         this.audioPlayer,
       );
-      this.source.connect(this.analyser);
-      this.analyser.connect(this.audioContext.destination);
-      this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-    }
-
-    if (this.isPlaying) {
-      this.animateVisualizer();
-    }
-  }
-
-  animateVisualizer() {
-    if (!this.analyser || !this.visualizerBars) return;
-
-    this.analyser.getByteFrequencyData(this.dataArray);
-
-    const binSkip = Math.floor(
-      this.dataArray.length / this.visualizerBars.length,
-    );
-
-    for (let i = 0; i < this.visualizerBars.length; i++) {
-      const mirrorIndex = this.visualizerBars.length - 1 - i;
-      const value =
-        (this.dataArray[i * binSkip] + this.dataArray[mirrorIndex * binSkip]) /
-          2 || 0;
-      const height = Math.pow(value / 255, 0.7) * 80 + 2;
-      const currentHeight =
-        parseFloat(this.visualizerBars[i].style.height) || 2;
-      const newHeight = currentHeight * 0.6 + height * 0.4;
-
-      this.visualizerBars[i].style.height = `${newHeight}px`;
-      this.visualizerBars[mirrorIndex].style.height = `${newHeight}px`;
-
-      if (newHeight > 15) {
-        this.visualizerBars[i].classList.add("active");
-        this.visualizerBars[mirrorIndex].classList.add("active");
-      } else {
-        this.visualizerBars[i].classList.remove("active");
-        this.visualizerBars[mirrorIndex].classList.remove("active");
-      }
-    }
-
-    this.animationId = requestAnimationFrame(() => this.animateVisualizer());
-  }
-
-  stopVisualizer() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
-
-    if (this.visualizerBars) {
-      this.visualizerBars.forEach((bar) => {
-        bar.style.height = "2px";
-        bar.classList.remove("active");
-      });
+      this.source.connect(this.audioContext.destination);
     }
   }
 
@@ -1104,27 +1031,40 @@ class MusicPlayer {
   }
 
   renderPlaylist() {
-    const displayOrder = this.isShuffled
-      ? this.shuffledIndices
+    let displayOrder = this.isShuffled
+      ? [...this.shuffledIndices]
       : [...Array(this.songs.length).keys()];
+
+    displayOrder.sort((a, b) => {
+      const aFav = this.isFavorite(this.songs[a]);
+      const bFav = this.isFavorite(this.songs[b]);
+      if (aFav && !bFav) return -1;
+      if (!aFav && bFav) return 1;
+      return 0;
+    });
+
+    this.playbackOrder = displayOrder;
 
     const playlistHTML = displayOrder
       .map((songIndex) => {
         const song = this.songs[songIndex];
+        const isFav = this.isFavorite(song);
         return `
-                      <div class="playlist-item ${
-                        songIndex === this.currentSongIndex ? "active" : ""
-                      }" data-index="${songIndex}">
-                        <div class="album-art-small" style="background-image: url('${
-                          song.albumArt
-                        }')"></div>
-                        <div class="playlist-item-info">
-                          <div class="playlist-item-title">${song.title}</div>
-                          <div class="playlist-item-artist">${song.artist}</div>
-                          <div class="playlist-item-duration">--:--</div>
-                        </div>
-                      </div>
-                    `;
+          <div class="playlist-item ${
+            songIndex === this.currentSongIndex ? "active" : ""
+          } ${isFav ? "favorite" : ""}" data-index="${songIndex}">
+            <div class="album-art-small" style="background-image: url('${
+              song.albumArt
+            }')"></div>
+            <div class="playlist-item-info">
+              <div class="playlist-item-title">
+                ${isFav ? '<i class="fas fa-heart fav-icon"></i>' : ""}
+                ${song.title}
+              </div>
+              <div class="playlist-item-artist">${song.artist}</div>
+            </div>
+          </div>
+        `;
       })
       .join("");
 
@@ -1162,6 +1102,8 @@ class MusicPlayer {
     if (this.backgroundMode === "album") {
       this.updateAlbumBackground(song.albumArt);
     }
+
+    this.updateFavoriteButton();
 
     this.durationEl.textContent = "--:--";
 
@@ -1257,37 +1199,16 @@ class MusicPlayer {
       requestAnimationFrame(() => {
         this.currentLyricIndex = -1;
 
-        const currentTime = this.audioPlayer.currentTime || 0;
-        if (lyrics && lyrics.length > 0) {
-          let activeIndex = -1;
-          for (let i = 0; i < lyrics.length; i++) {
-            if (lyrics[i].time <= currentTime) {
-              activeIndex = i;
-            } else {
-              break;
-            }
-          }
-
-          if (currentTime < 0.5 && activeIndex === -1) {
-            activeIndex = 0;
-          }
-
-          if (activeIndex >= 0) {
-            const allLyrics =
-              this.lyricsContent.querySelectorAll(".lyrics-line");
-            const targetLyric = allLyrics[activeIndex];
-            if (targetLyric && this.lyricsBox) {
-              const lyricTop = targetLyric.offsetTop;
-              const lyricHeight = targetLyric.offsetHeight;
-              const boxHeight = this.lyricsBox.clientHeight;
-              const scrollTo = lyricTop - boxHeight / 2 + lyricHeight / 2;
-
-              this.lyricsBox.scrollTop = Math.max(0, scrollTo);
-            }
-          }
+        if (this.lyricsBox) {
+          this.lyricsBox.scrollTop = 0;
         }
 
-        this.updateActiveLyric();
+        const allLyrics = this.lyricsContent.querySelectorAll(".lyrics-line");
+        allLyrics.forEach((line) => line.classList.remove("active"));
+
+        if (allLyrics.length > 0) {
+          allLyrics[0].classList.add("active");
+        }
 
         this.lyricsContent.style.opacity = "1";
 
@@ -1550,7 +1471,6 @@ class MusicPlayer {
           this.audioContext.resume();
         }
         this.setupAudioAnalysis();
-        this.animateVisualizer();
         return;
       }
     }
@@ -1558,7 +1478,6 @@ class MusicPlayer {
     if (this.isPlaying) {
       this.audioPlayer.pause();
       this.isPlaying = false;
-      this.stopVisualizer();
     }
 
     this.currentSongIndex = index;
@@ -1592,7 +1511,6 @@ class MusicPlayer {
         .then(() => {
           this.isPlaying = true;
           this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-          this.animateVisualizer();
 
           this.preloadNextSong();
           this.trackSongPlay();
@@ -1650,7 +1568,6 @@ class MusicPlayer {
       if (!this.audioContext) {
         this.setupAudioAnalysis();
       }
-      this.animateVisualizer();
     } catch (error) {
       console.warn(`Play attempt ${retryCount + 1} failed:`, error.name);
 
@@ -1716,7 +1633,6 @@ class MusicPlayer {
     this.isPlaying = false;
     this.playBtn.innerHTML = '<i class="fas fa-play"></i>';
     document.body.classList.remove("is-playing");
-    this.stopVisualizer();
   }
 
   prevSong() {
@@ -1748,12 +1664,15 @@ class MusicPlayer {
     } else {
       let prevIndex;
 
-      if (this.isShuffled) {
-        this.currentShuffleIndex =
-          this.currentShuffleIndex > 0
-            ? this.currentShuffleIndex - 1
-            : this.shuffledIndices.length - 1;
-        prevIndex = this.shuffledIndices[this.currentShuffleIndex];
+      if (this.playbackOrder && this.playbackOrder.length > 0) {
+        const currentPosInOrder = this.playbackOrder.indexOf(
+          this.currentSongIndex,
+        );
+        const prevPosInOrder =
+          currentPosInOrder > 0
+            ? currentPosInOrder - 1
+            : this.playbackOrder.length - 1;
+        prevIndex = this.playbackOrder[prevPosInOrder];
       } else {
         prevIndex =
           this.currentSongIndex > 0
@@ -1780,12 +1699,15 @@ class MusicPlayer {
 
     let nextIndex;
 
-    if (this.isShuffled) {
-      this.currentShuffleIndex =
-        this.currentShuffleIndex < this.shuffledIndices.length - 1
-          ? this.currentShuffleIndex + 1
+    if (this.playbackOrder && this.playbackOrder.length > 0) {
+      const currentPosInOrder = this.playbackOrder.indexOf(
+        this.currentSongIndex,
+      );
+      const nextPosInOrder =
+        currentPosInOrder < this.playbackOrder.length - 1
+          ? currentPosInOrder + 1
           : 0;
-      nextIndex = this.shuffledIndices[this.currentShuffleIndex];
+      nextIndex = this.playbackOrder[nextPosInOrder];
     } else {
       nextIndex =
         this.currentSongIndex < this.songs.length - 1
@@ -2093,7 +2015,6 @@ class MusicPlayer {
     if (this.backgroundChangeInterval) {
       clearInterval(this.backgroundChangeInterval);
     }
-    this.stopVisualizer();
     if (this.audioContext) {
       this.audioContext.close();
     }
@@ -2377,6 +2298,75 @@ class MusicPlayer {
     this.stats.songPlayCounts[songKey] =
       (this.stats.songPlayCounts[songKey] || 0) + 1;
     this.saveToStorage("harmony_stats", this.stats);
+  }
+
+  setupFavorites() {
+    if (!this.favoriteBtn) return;
+
+    this.favoriteBtn.addEventListener("click", () => {
+      this.toggleFavorite();
+    });
+  }
+
+  setupFAB() {
+    const fabContainer = document.getElementById("fabContainer");
+    const fabToggle = document.getElementById("fabToggle");
+
+    if (!fabContainer || !fabToggle) return;
+
+    fabToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fabContainer.classList.toggle("open");
+      fabToggle.classList.toggle("active");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!fabContainer.contains(e.target)) {
+        fabContainer.classList.remove("open");
+        fabToggle.classList.remove("active");
+      }
+    });
+  }
+
+  toggleFavorite() {
+    const song = this.songs[this.currentSongIndex];
+    if (!song) return;
+
+    const songId = `${song.title}-${song.artist}`;
+    const index = this.favorites.indexOf(songId);
+
+    if (index === -1) {
+      this.favorites.push(songId);
+      this.showToast("fas fa-heart", "Added to Favorites");
+    } else {
+      this.favorites.splice(index, 1);
+      this.showToast("far fa-heart", "Removed from Favorites");
+    }
+
+    this.saveToStorage("harmony_favorites", this.favorites);
+    this.updateFavoriteButton();
+    this.renderPlaylist();
+  }
+
+  isFavorite(song) {
+    if (!song) return false;
+    const songId = `${song.title}-${song.artist}`;
+    return this.favorites.includes(songId);
+  }
+
+  updateFavoriteButton() {
+    if (!this.favoriteBtn) return;
+
+    const song = this.songs[this.currentSongIndex];
+    const isFav = this.isFavorite(song);
+
+    this.favoriteBtn.classList.toggle("active", isFav);
+    this.favoriteBtn.innerHTML = isFav
+      ? '<i class="fas fa-heart"></i>'
+      : '<i class="far fa-heart"></i>';
+    this.favoriteBtn.title = isFav
+      ? "Remove from Favorites"
+      : "Add to Favorites";
   }
 
   preloadNextSong() {

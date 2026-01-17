@@ -10,6 +10,14 @@ class MusicPlayer {
         lyricsKey: "about_you",
       },
       {
+        title: "A Sorrowful Reunion",
+        artist: "Reality Club",
+        src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/A Sorrowful Reunion - Reality Club.mp3",
+        albumArt:
+          "https://raw.githubusercontent.com/RiazRep/music-import/main/Album/rc.png",
+        lyricsKey: "sorrowful",
+      },
+      {
         title: "Let it Happen",
         artist: "Tame Impala",
         src: "https://raw.githubusercontent.com/RiazRep/music-import/main/Music/Tame Impala - Let It Happen.opus",

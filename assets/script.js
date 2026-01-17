@@ -343,6 +343,22 @@ class MusicPlayer {
     this.toastMessage = this.toastContainer.querySelector(".toast-message");
     this.toastTimeout = null;
 
+    this.downloadBtn = document.getElementById("downloadBtn");
+    this.statsBtn = document.getElementById("statsBtn");
+    this.statsModal = document.getElementById("statsModal");
+    this.statsClose = document.getElementById("statsClose");
+    this.totalListeningTimeEl = document.getElementById("totalListeningTime");
+    this.totalPlaysEl = document.getElementById("totalPlays");
+    this.mostPlayedSongEl = document.getElementById("mostPlayedSong");
+
+    this.stats = this.loadFromStorage("harmony_stats", {
+      totalListeningSeconds: 0,
+      totalPlays: 0,
+      songPlayCounts: {},
+    });
+
+    this.nextAudioPreload = null;
+
     this.backgroundImages = [
       "./image/background.jpg",
       "./image/background2.jpg",
@@ -394,6 +410,8 @@ class MusicPlayer {
     this.setupCursorHide();
     this.setupSleepTimer();
     this.setupBackgroundSwitcher();
+    this.setupDownload();
+    this.setupStats();
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
@@ -1575,10 +1593,15 @@ class MusicPlayer {
           this.isPlaying = true;
           this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
           this.animateVisualizer();
+
+          this.preloadNextSong();
+          this.trackSongPlay();
         })
         .catch((error) => {
           console.error("Error playing audio:", error);
         });
+    } else {
+      this.preloadNextSong();
     }
   }
 
@@ -1910,6 +1933,8 @@ class MusicPlayer {
     });
 
     this.audioPlayer.addEventListener("ended", () => {
+      this.trackSongPlay();
+
       if (this.repeatMode === 1) {
         this.audioPlayer.currentTime = 0;
         this.audioPlayer.play();
@@ -1921,19 +1946,16 @@ class MusicPlayer {
         ) {
           this.pause();
         } else {
-          this.isChangingSong = true;
-          this.isAutoScrolling = true;
-          if (this.lyricsBox) {
-            this.lyricsBox.classList.remove("user-scrolling");
+          if (this.nextAudioPreload && this.nextAudioPreload.readyState >= 3) {
+            this.isChangingSong = true;
+            this.nextSong();
+          } else {
+            this.isChangingSong = true;
+            this.nextSong();
           }
-          this.nextSong();
         }
       } else {
         this.isChangingSong = true;
-        this.isAutoScrolling = true;
-        if (this.lyricsBox) {
-          this.lyricsBox.classList.remove("user-scrolling");
-        }
         this.nextSong();
       }
     });
@@ -2264,6 +2286,131 @@ class MusicPlayer {
       this.updateBackground(true);
       this.startBackgroundRotation();
     }
+  }
+
+  setupDownload() {
+    if (!this.downloadBtn) return;
+
+    this.downloadBtn.addEventListener("click", () => {
+      this.addClickFeedback(this.downloadBtn);
+      this.downloadCurrentSong();
+    });
+  }
+
+  downloadCurrentSong() {
+    const song = this.songs[this.currentSongIndex];
+    if (!song) return;
+
+    const link = document.createElement("a");
+    link.href = song.src;
+    link.download = `${song.artist} - ${song.title}.mp3`;
+    link.target = "_blank";
+    link.style.display = "none";
+    document.body.appendChild(link);
+
+    try {
+      link.click();
+      this.showToast("fas fa-download", "Downloading...");
+    } catch (e) {
+      console.error("Download failed:", e);
+      this.showToast("fas fa-exclamation-circle", "Download Failed");
+    }
+
+    setTimeout(() => {
+      document.body.removeChild(link);
+    }, 100);
+  }
+
+  setupStats() {
+    if (!this.statsBtn || !this.statsModal) return;
+
+    this.statsBtn.addEventListener("click", () => {
+      this.addClickFeedback(this.statsBtn);
+      this.showStats();
+    });
+
+    this.statsClose.addEventListener("click", () => {
+      this.statsModal.classList.remove("show");
+    });
+
+    this.statsModal.addEventListener("click", (e) => {
+      if (e.target === this.statsModal) {
+        this.statsModal.classList.remove("show");
+      }
+    });
+
+    this.listeningInterval = setInterval(() => {
+      if (this.isPlaying) {
+        this.stats.totalListeningSeconds++;
+        this.saveToStorage("harmony_stats", this.stats);
+      }
+    }, 1000);
+  }
+
+  showStats() {
+    const hours = Math.floor(this.stats.totalListeningSeconds / 3600);
+    const minutes = Math.floor((this.stats.totalListeningSeconds % 3600) / 60);
+    this.totalListeningTimeEl.textContent = `${hours}h ${minutes}m`;
+
+    this.totalPlaysEl.textContent = this.stats.totalPlays;
+
+    let mostPlayed = "-";
+    let maxPlays = 0;
+    for (const [songKey, count] of Object.entries(this.stats.songPlayCounts)) {
+      if (count > maxPlays) {
+        maxPlays = count;
+        mostPlayed = songKey;
+      }
+    }
+    this.mostPlayedSongEl.textContent =
+      maxPlays > 0 ? `${mostPlayed} (${maxPlays}x)` : "-";
+
+    this.statsModal.classList.add("show");
+  }
+
+  trackSongPlay() {
+    const song = this.songs[this.currentSongIndex];
+    if (!song) return;
+
+    this.stats.totalPlays++;
+    const songKey = song.title;
+    this.stats.songPlayCounts[songKey] =
+      (this.stats.songPlayCounts[songKey] || 0) + 1;
+    this.saveToStorage("harmony_stats", this.stats);
+  }
+
+  preloadNextSong() {
+    const nextIndex = this.getNextSongIndex();
+    if (nextIndex === null) return;
+
+    const nextSong = this.songs[nextIndex];
+    if (!nextSong) return;
+
+    if (this.nextAudioPreload) {
+      this.nextAudioPreload.src = "";
+      this.nextAudioPreload = null;
+    }
+
+    this.nextAudioPreload = new Audio();
+    this.nextAudioPreload.preload = "auto";
+    this.nextAudioPreload.src = nextSong.src;
+    this.nextAudioPreload.load();
+  }
+
+  getNextSongIndex() {
+    if (this.repeatMode === 1) return this.currentSongIndex;
+
+    if (this.isShuffled) {
+      const nextShuffleIndex =
+        this.currentShuffleIndex < this.shuffledIndices.length - 1
+          ? this.currentShuffleIndex + 1
+          : 0;
+      return this.shuffledIndices[nextShuffleIndex];
+    }
+
+    return this.currentSongIndex < this.songs.length - 1
+      ? this.currentSongIndex + 1
+      : 0;
   }
 
   async performCrossfade(nextIndex) {

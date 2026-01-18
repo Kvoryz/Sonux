@@ -1317,6 +1317,8 @@ class MusicPlayer {
 
     if (activeIndex === this.currentLyricIndex) return;
 
+    this.currentLyricIndex = activeIndex;
+
     let maxWords = 0;
     this.currentLyrics.forEach((line) => {
       if (line.text && line.text !== "•••") {
@@ -1560,7 +1562,10 @@ class MusicPlayer {
         await this.waitForAudioReady();
       }
 
+      this.audioPlayer.volume = 0;
       await this.audioPlayer.play();
+      await this.fadeIn();
+
       this.isPlaying = true;
       this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
       document.body.classList.add("is-playing");
@@ -1603,24 +1608,44 @@ class MusicPlayer {
     }
   }
 
+  async fadeIn(duration = 300) {
+    const targetVolume = this.targetVolume || 1;
+    const steps = 15;
+    const stepTime = duration / steps;
+    const volumeStep = targetVolume / steps;
+
+    for (let i = 0; i <= steps; i++) {
+      this.audioPlayer.volume = Math.min(volumeStep * i, targetVolume);
+      await new Promise((r) => setTimeout(r, stepTime));
+    }
+    this.audioPlayer.volume = targetVolume;
+  }
+
+  async fadeOut(duration = 200) {
+    const startVolume = this.audioPlayer.volume;
+    this.targetVolume = startVolume;
+    const steps = 10;
+    const stepTime = duration / steps;
+    const volumeStep = startVolume / steps;
+
+    for (let i = steps; i >= 0; i--) {
+      this.audioPlayer.volume = Math.max(volumeStep * i, 0);
+      await new Promise((r) => setTimeout(r, stepTime));
+    }
+  }
+
   waitForAudioReady() {
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error("Audio load timeout"));
-      }, this.networkInfo?.timeout || 30000);
-
       const onCanPlay = () => {
-        clearTimeout(timeout);
         this.audioPlayer.removeEventListener("canplay", onCanPlay);
         this.audioPlayer.removeEventListener("error", onError);
         resolve();
       };
 
-      const onError = () => {
-        clearTimeout(timeout);
+      const onError = (e) => {
         this.audioPlayer.removeEventListener("canplay", onCanPlay);
         this.audioPlayer.removeEventListener("error", onError);
-        reject(new Error("Audio load error"));
+        reject(e);
       };
 
       this.audioPlayer.addEventListener("canplay", onCanPlay);
@@ -1628,8 +1653,10 @@ class MusicPlayer {
     });
   }
 
-  pause() {
+  async pause() {
+    await this.fadeOut();
     this.audioPlayer.pause();
+    this.audioPlayer.volume = this.targetVolume || 1;
     this.isPlaying = false;
     this.playBtn.innerHTML = '<i class="fas fa-play"></i>';
     document.body.classList.remove("is-playing");
@@ -1857,6 +1884,12 @@ class MusicPlayer {
     this.audioPlayer.addEventListener("ended", () => {
       this.trackSongPlay();
 
+      if (this.sleepAtEndOfSong) {
+        this.pause();
+        this.clearSleepTimer();
+        return;
+      }
+
       if (this.repeatMode === 1) {
         this.audioPlayer.currentTime = 0;
         this.audioPlayer.play();
@@ -2060,8 +2093,13 @@ class MusicPlayer {
       .querySelectorAll(".sleep-timer-option")
       .forEach((option) => {
         option.addEventListener("click", () => {
-          const minutes = parseInt(option.dataset.minutes);
-          this.setSleepTimer(minutes);
+          const value = option.dataset.minutes;
+          if (value === "end") {
+            this.setSleepTimer("end");
+          } else {
+            const minutes = parseInt(value);
+            this.setSleepTimer(minutes);
+          }
           this.sleepTimerMenu.classList.remove("active");
         });
       });
@@ -2071,6 +2109,14 @@ class MusicPlayer {
     this.clearSleepTimer();
 
     if (minutes === 0) {
+      return;
+    }
+
+    if (minutes === "end") {
+      this.sleepAtEndOfSong = true;
+      this.sleepTimerBtn.classList.add("active");
+      this.sleepTimerDisplay.classList.add("active");
+      this.updateSleepTimerDisplay();
       return;
     }
 
@@ -2103,6 +2149,7 @@ class MusicPlayer {
       this.sleepTimerInterval = null;
     }
     this.sleepTimerEndTime = null;
+    this.sleepAtEndOfSong = false;
 
     if (this.sleepTimerBtn) {
       this.sleepTimerBtn.classList.remove("active");
@@ -2114,6 +2161,10 @@ class MusicPlayer {
   }
 
   updateSleepTimerDisplay() {
+    if (this.sleepAtEndOfSong) {
+      if (this.sleepTimerDisplay) this.sleepTimerDisplay.textContent = "End";
+      return;
+    }
     if (!this.sleepTimerEndTime || !this.sleepTimerDisplay) return;
 
     const remaining = Math.max(0, this.sleepTimerEndTime - Date.now());

@@ -388,9 +388,10 @@ body {
 }
 
 .play-btn:hover {
-  background: #f0f0f0;
+  background: #ffffff;
+  color: #000000;
   transform: scale(1.1);
-  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.6);
 }
 
 /* Icon styling */

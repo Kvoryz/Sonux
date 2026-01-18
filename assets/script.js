@@ -301,6 +301,9 @@ class MusicPlayer {
     this.currentlyPreloading = 0;
     this.preloadAttempts = {};
     this.preloadPriorities = [];
+    this.maxCacheSize = 10;
+    this.preloadAccessOrder = [];
+    this.preloadAbortControllers = {};
 
     this.setupNetworkListener();
 
@@ -412,6 +415,7 @@ class MusicPlayer {
     this.setupStats();
     this.setupFavorites();
     this.setupFAB();
+    this.setupOnboarding();
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
@@ -482,7 +486,10 @@ class MusicPlayer {
   }
 
   preloadAudio(index) {
-    if (this.preloadedAudios[index]) return;
+    if (this.preloadedAudios[index]) {
+      this.updateAccessOrder(index);
+      return;
+    }
 
     if (!this.preloadAttempts[index]) {
       this.preloadAttempts[index] = 0;
@@ -496,6 +503,9 @@ class MusicPlayer {
     this.preloadAttempts[index]++;
     this.currentlyPreloading++;
 
+    const abortController = new AbortController();
+    this.preloadAbortControllers[index] = abortController;
+
     const song = this.songs[index];
     const audio = document.createElement("audio");
     audio.preload = "auto";
@@ -504,7 +514,12 @@ class MusicPlayer {
     audio.dataset.songIndex = index;
 
     const onLoadSuccess = () => {
+      if (abortController.signal.aborted) return;
+
+      delete this.preloadAbortControllers[index];
       this.preloadedAudios[index] = audio;
+      this.updateAccessOrder(index);
+      this.evictOldPreloads();
       this.currentlyPreloading--;
 
       const playlistItem = this.playlistContainer.querySelector(
@@ -518,6 +533,9 @@ class MusicPlayer {
     };
 
     const onLoadError = () => {
+      if (abortController.signal.aborted) return;
+
+      delete this.preloadAbortControllers[index];
       console.error(
         `Failed to preload song: ${song.title} (attempt ${this.preloadAttempts[index]})`,
       );
@@ -533,12 +551,19 @@ class MusicPlayer {
       }
     };
 
+    abortController.signal.addEventListener("abort", () => {
+      audio.src = "";
+      audio.remove();
+      this.currentlyPreloading--;
+      delete this.preloadAbortControllers[index];
+    });
+
     audio.oncanplaythrough = onLoadSuccess;
     audio.onerror = onLoadError;
     audio.onabort = onLoadError;
 
     const loadTimeout = setTimeout(() => {
-      if (!audio.readyState) {
+      if (!audio.readyState && !abortController.signal.aborted) {
         console.warn(`Preload timeout for song ${index}`);
         audio.src = "";
         onLoadError();
@@ -548,6 +573,48 @@ class MusicPlayer {
     audio.onloadeddata = () => clearTimeout(loadTimeout);
 
     this.audioPreloadContainer.appendChild(audio);
+  }
+
+  updateAccessOrder(index) {
+    const pos = this.preloadAccessOrder.indexOf(index);
+    if (pos > -1) {
+      this.preloadAccessOrder.splice(pos, 1);
+    }
+    this.preloadAccessOrder.push(index);
+  }
+
+  evictOldPreloads() {
+    while (Object.keys(this.preloadedAudios).length > this.maxCacheSize) {
+      const oldestIndex = this.preloadAccessOrder.shift();
+      if (oldestIndex !== undefined && this.preloadedAudios[oldestIndex]) {
+        console.log(`🗑️ Evicting preload: song ${oldestIndex}`);
+        this.preloadedAudios[oldestIndex].src = "";
+        this.preloadedAudios[oldestIndex].remove();
+        delete this.preloadedAudios[oldestIndex];
+
+        const playlistItem = this.playlistContainer.querySelector(
+          `.playlist-item[data-index="${oldestIndex}"]`,
+        );
+        if (playlistItem) {
+          playlistItem.classList.remove("preloaded");
+        }
+      }
+    }
+  }
+
+  cancelIrrelevantPreloads(currentIndex) {
+    const relevantRange = 3;
+    Object.keys(this.preloadAbortControllers).forEach((indexStr) => {
+      const index = parseInt(indexStr, 10);
+      const distance = Math.min(
+        Math.abs(index - currentIndex),
+        this.songs.length - Math.abs(index - currentIndex),
+      );
+      if (distance > relevantRange) {
+        console.log(`❌ Cancelling preload: song ${index} (too far)`);
+        this.preloadAbortControllers[index].abort();
+      }
+    });
   }
 
   clearPreloads() {
@@ -1449,6 +1516,8 @@ class MusicPlayer {
   async selectSong(index) {
     if (index < 0 || index >= this.songs.length) return;
 
+    this.cancelIrrelevantPreloads(index);
+
     const wasPlaying = this.isPlaying;
     const previousIndex = this.currentSongIndex;
 
@@ -1522,20 +1591,6 @@ class MusicPlayer {
         });
     } else {
       this.preloadNextSong();
-    }
-  }
-
-  preloadAdjacentSongs(currentIndex) {
-    const nextIndex =
-      currentIndex < this.songs.length - 1 ? currentIndex + 1 : 0;
-    if (!this.preloadedAudios[nextIndex]) {
-      this.preloadAudio(nextIndex);
-    }
-
-    const prevIndex =
-      currentIndex > 0 ? currentIndex - 1 : this.songs.length - 1;
-    if (!this.preloadedAudios[prevIndex]) {
-      this.preloadAudio(prevIndex);
     }
   }
 
@@ -2377,6 +2432,56 @@ class MusicPlayer {
         fabToggle.classList.remove("active");
       }
     });
+  }
+
+  setupOnboarding() {
+    const hasSeenOnboarding = localStorage.getItem("sonux_onboarding_seen");
+    if (hasSeenOnboarding) return;
+
+    const lyricsTooltip = document.getElementById("lyricsTooltip");
+    const playlistTooltip = document.getElementById("playlistTooltip");
+
+    if (!lyricsTooltip || !playlistTooltip) return;
+
+    setTimeout(() => {
+      lyricsTooltip.classList.add("visible");
+      playlistTooltip.classList.add("visible");
+    }, 2000);
+
+    const dismissTooltip = (tooltip) => {
+      tooltip.classList.remove("visible");
+      if (
+        !lyricsTooltip.classList.contains("visible") &&
+        !playlistTooltip.classList.contains("visible")
+      ) {
+        localStorage.setItem("sonux_onboarding_seen", "true");
+      }
+    };
+
+    lyricsTooltip
+      .querySelector(".tooltip-dismiss")
+      .addEventListener("click", () => {
+        dismissTooltip(lyricsTooltip);
+      });
+
+    playlistTooltip
+      .querySelector(".tooltip-dismiss")
+      .addEventListener("click", () => {
+        dismissTooltip(playlistTooltip);
+      });
+
+    this.lyricsContainer.addEventListener("click", () => {
+      dismissTooltip(lyricsTooltip);
+    });
+
+    this.playlistTrigger.addEventListener("mouseenter", () => {
+      dismissTooltip(playlistTooltip);
+    });
+
+    setTimeout(() => {
+      dismissTooltip(lyricsTooltip);
+      dismissTooltip(playlistTooltip);
+    }, 10000);
   }
 
   toggleFavorite() {

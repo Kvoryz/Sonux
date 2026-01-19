@@ -1614,6 +1614,16 @@ class MusicPlayer {
   async selectSong(index) {
     if (index < 0 || index >= this.songs.length) return;
 
+    const now = Date.now();
+    if (this.lastSongChangeTime && now - this.lastSongChangeTime < 200) {
+      console.log("🚫 Song change debounced");
+      return;
+    }
+    this.lastSongChangeTime = now;
+
+    this.songChangeVersion = (this.songChangeVersion || 0) + 1;
+    const thisChangeVersion = this.songChangeVersion;
+
     this.cancelIrrelevantPreloads(index);
     this.resetGaplessState();
 
@@ -1634,6 +1644,11 @@ class MusicPlayer {
       this.updateBackground(true);
 
       const crossfadeSuccess = await this.performCrossfade(index);
+
+      if (this.songChangeVersion !== thisChangeVersion) {
+        console.log("🚫 Stale crossfade ignored");
+        return;
+      }
 
       if (crossfadeSuccess) {
         this.updatePreloadPriorities(index);
@@ -1658,11 +1673,10 @@ class MusicPlayer {
 
     const song = this.songs[this.currentSongIndex];
 
-    if (this.preloadedAudios[index]) {
-      this.audioPlayer.src = song.src;
-      this.audioPlayer.currentTime = 0;
-    } else {
-      this.audioPlayer.src = song.src;
+    this.audioPlayer.src = song.src;
+    this.audioPlayer.currentTime = 0;
+
+    if (!this.preloadedAudios[index]) {
       this.preloadAudio(index);
     }
 
@@ -1676,9 +1690,19 @@ class MusicPlayer {
     this.setupAudioAnalysis();
 
     if (wasPlaying) {
+      if (this.songChangeVersion !== thisChangeVersion) {
+        console.log("🚫 Stale play ignored");
+        return;
+      }
+
       this.audioPlayer
         .play()
         .then(() => {
+          if (this.songChangeVersion !== thisChangeVersion) {
+            this.audioPlayer.pause();
+            console.log("🚫 Stale audio stopped after play");
+            return;
+          }
           this.isPlaying = true;
           this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
 
@@ -2042,6 +2066,17 @@ class MusicPlayer {
     });
 
     this.audioPlayer.addEventListener("loadedmetadata", () => {
+      const currentSong = this.songs[this.currentSongIndex];
+      if (
+        !currentSong ||
+        !this.audioPlayer.src.includes(
+          encodeURIComponent(currentSong.src.split("/").pop()),
+        )
+      ) {
+        console.log("🚫 Stale loadedmetadata ignored");
+        return;
+      }
+
       this.durationEl.textContent = this.formatTime(this.audioPlayer.duration);
 
       const activeItem = this.playlistContainer.querySelector(
@@ -2790,6 +2825,12 @@ class MusicPlayer {
   hideContextMenu() {
     this.contextMenuActive = false;
     this.contextMenu.classList.remove("active");
+
+    setTimeout(() => {
+      if (!this.playlistHovered && !this.contextMenuActive) {
+        this.hidePlaylist();
+      }
+    }, 200);
   }
 
   playNext(index) {
@@ -3053,12 +3094,25 @@ class MusicPlayer {
 
     if (!currentSong || !nextSong) return false;
 
+    const crossfadeVersion = this.songChangeVersion;
     this.isCrossfading = true;
 
     this.crossfadeAudio = new Audio();
     this.crossfadeAudio.src = nextSong.src;
     this.crossfadeAudio.crossOrigin = "anonymous";
     this.crossfadeAudio.volume = 0;
+
+    const abortCrossfade = () => {
+      console.log("🚫 Crossfade aborted - song changed");
+      this.isCrossfading = false;
+      if (this.crossfadeAudio) {
+        this.crossfadeAudio.pause();
+        this.crossfadeAudio.src = "";
+        this.crossfadeAudio = null;
+      }
+      this.audioPlayer.volume = 1;
+      return false;
+    };
 
     try {
       await new Promise((resolve, reject) => {
@@ -3069,17 +3123,32 @@ class MusicPlayer {
         this.crossfadeAudio.load();
       });
 
+      if (this.songChangeVersion !== crossfadeVersion) {
+        return abortCrossfade();
+      }
+
       await this.crossfadeAudio.play();
+
+      if (this.songChangeVersion !== crossfadeVersion) {
+        return abortCrossfade();
+      }
 
       const startVolume = this.audioPlayer.volume;
       const steps = 30;
       const stepDuration = this.crossfadeDuration / steps;
 
       for (let i = 0; i <= steps; i++) {
+        if (this.songChangeVersion !== crossfadeVersion) {
+          return abortCrossfade();
+        }
         const progress = i / steps;
         this.audioPlayer.volume = startVolume * (1 - progress);
         this.crossfadeAudio.volume = startVolume * progress;
         await new Promise((r) => setTimeout(r, stepDuration));
+      }
+
+      if (this.songChangeVersion !== crossfadeVersion) {
+        return abortCrossfade();
       }
 
       this.audioPlayer.pause();

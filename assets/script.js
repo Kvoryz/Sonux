@@ -1168,6 +1168,7 @@ class MusicPlayer {
     this.albumArt.style.backgroundSize = "cover";
     this.albumArt.style.backgroundPosition = "center";
     this.albumArt.textContent = "";
+    this.albumArt.classList.remove("skeleton");
 
     if (this.backgroundMode === "album") {
       this.updateAlbumBackground(song.albumArt);

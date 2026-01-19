@@ -1058,6 +1058,7 @@ class MusicPlayer {
     }
 
     this.renderPlaylist();
+    this.updateNextSongTooltip();
 
     this.showToast(
       "fas fa-random",
@@ -1095,6 +1096,8 @@ class MusicPlayer {
         this.showToast("fas fa-forward-step", "Play Once");
         break;
     }
+
+    this.updateNextSongTooltip();
   }
 
   renderPlaylist() {
@@ -1171,6 +1174,7 @@ class MusicPlayer {
     }
 
     this.updateFavoriteButton();
+    this.updateNextSongTooltip();
 
     this.durationEl.textContent = "--:--";
 
@@ -1182,6 +1186,45 @@ class MusicPlayer {
       });
 
     this.updateLyricsDisplay();
+  }
+
+  updateNextSongTooltip() {
+    const nextTooltip = document.getElementById("nextSongTooltip");
+    const prevTooltip = document.getElementById("prevSongTooltip");
+
+    if (!this.playbackOrder || this.playbackOrder.length === 0) return;
+
+    const currentPosInOrder = this.playbackOrder.indexOf(this.currentSongIndex);
+
+    if (nextTooltip) {
+      if (this.repeatMode === 1) {
+        nextTooltip.textContent = `Up next: ${this.songs[this.currentSongIndex].title}`;
+      } else {
+        const nextPosInOrder =
+          currentPosInOrder < this.playbackOrder.length - 1
+            ? currentPosInOrder + 1
+            : 0;
+        const nextIndex = this.playbackOrder[nextPosInOrder];
+        if (this.songs[nextIndex]) {
+          nextTooltip.textContent = `Up next: ${this.songs[nextIndex].title}`;
+        }
+      }
+    }
+
+    if (prevTooltip) {
+      if (this.repeatMode === 1) {
+        prevTooltip.textContent = `Previous: ${this.songs[this.currentSongIndex].title}`;
+      } else {
+        const prevPosInOrder =
+          currentPosInOrder > 0
+            ? currentPosInOrder - 1
+            : this.playbackOrder.length - 1;
+        const prevIndex = this.playbackOrder[prevPosInOrder];
+        if (this.songs[prevIndex]) {
+          prevTooltip.textContent = `Previous: ${this.songs[prevIndex].title}`;
+        }
+      }
+    }
   }
 
   async updateLyricsDisplay() {
@@ -2470,7 +2513,7 @@ class MusicPlayer {
         dismissTooltip(playlistTooltip);
       });
 
-    this.lyricsContainer.addEventListener("click", () => {
+    this.albumArt.addEventListener("click", () => {
       dismissTooltip(lyricsTooltip);
     });
 
@@ -2546,17 +2589,39 @@ class MusicPlayer {
   getNextSongIndex() {
     if (this.repeatMode === 1) return this.currentSongIndex;
 
-    if (this.isShuffled) {
-      const nextShuffleIndex =
-        this.currentShuffleIndex < this.shuffledIndices.length - 1
-          ? this.currentShuffleIndex + 1
+    if (this.playbackOrder && this.playbackOrder.length > 0) {
+      const currentPosInOrder = this.playbackOrder.indexOf(
+        this.currentSongIndex,
+      );
+      const nextPosInOrder =
+        currentPosInOrder < this.playbackOrder.length - 1
+          ? currentPosInOrder + 1
           : 0;
-      return this.shuffledIndices[nextShuffleIndex];
+      return this.playbackOrder[nextPosInOrder];
     }
 
     return this.currentSongIndex < this.songs.length - 1
       ? this.currentSongIndex + 1
       : 0;
+  }
+
+  getPrevSongIndex() {
+    if (this.repeatMode === 1) return this.currentSongIndex;
+
+    if (this.playbackOrder && this.playbackOrder.length > 0) {
+      const currentPosInOrder = this.playbackOrder.indexOf(
+        this.currentSongIndex,
+      );
+      const prevPosInOrder =
+        currentPosInOrder > 0
+          ? currentPosInOrder - 1
+          : this.playbackOrder.length - 1;
+      return this.playbackOrder[prevPosInOrder];
+    }
+
+    return this.currentSongIndex > 0
+      ? this.currentSongIndex - 1
+      : this.songs.length - 1;
   }
 
   async performCrossfade(nextIndex) {

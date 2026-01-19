@@ -242,7 +242,9 @@ body {
   object-fit: cover;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease;
-  background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,6 +254,15 @@ body {
   background-position: center;
   cursor: pointer;
   align-self: center;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .album-art:hover {
@@ -419,6 +430,86 @@ body {
   font-size: 1.2rem;
 }
 
+/* Next Song Tooltip */
+.next-btn-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.next-song-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+}
+
+.next-song-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+}
+
+.next-btn-wrapper:hover .next-song-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Previous Song Tooltip */
+.prev-btn-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.prev-song-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+}
+
+.prev-song-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+}
+
+.prev-btn-wrapper:hover .prev-song-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .progress-container {
   margin: 20px 0;
 }
@@ -558,7 +649,9 @@ body {
   height: 40px;
   border-radius: 5px;
   object-fit: cover;
-  background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -936,6 +1029,42 @@ body.is-playing .lyrics-line.dots-placeholder.active .dot:nth-child(3) {
     transform: translateY(-8px);
     opacity: 1;
   }
+}
+
+/* Fade Direction Effect */
+.lyrics-line {
+  transform: translateY(15px);
+  transition:
+    transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    opacity 0.4s ease,
+    filter 0.4s ease,
+    color 0.4s ease;
+}
+
+.lyrics-line.active {
+  transform: translateY(0);
+}
+
+.lyrics-line.active-prev {
+  transform: translateY(-5px);
+}
+
+.lyrics-line.active-next {
+  transform: translateY(10px);
+}
+
+.lyrics-line.far-prev,
+.lyrics-line.very-far-prev {
+  transform: translateY(-10px);
+}
+
+.lyrics-line.far-next,
+.lyrics-line.very-far-next {
+  transform: translateY(15px);
+}
+
+.lyrics-line.hidden-lyric {
+  transform: translateY(20px);
 }
 
 /* ========== NEW FEATURES STYLES ========== */
@@ -1651,25 +1780,25 @@ body.is-playing .lyrics-line.dots-placeholder.active .dot:nth-child(3) {
   pointer-events: auto;
 }
 
-.onboarding-tooltip[data-target="lyrics"] {
-  left: 80px;
-  top: 50%;
-  transform: translateY(-50%);
+.onboarding-tooltip[data-target="album"] {
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, 0);
 }
 
-.onboarding-tooltip[data-target="lyrics"].visible {
-  transform: translateY(-50%);
+.onboarding-tooltip[data-target="album"].visible {
+  transform: translate(-50%, 0);
 }
 
-.onboarding-tooltip[data-target="lyrics"]::after {
+.onboarding-tooltip[data-target="album"]::after {
   content: "";
   position: absolute;
-  left: -8px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
   border-width: 8px;
   border-style: solid;
-  border-color: transparent rgba(255, 255, 255, 0.95) transparent transparent;
+  border-color: transparent transparent rgba(255, 255, 255, 0.95) transparent;
 }
 
 .onboarding-tooltip[data-target="playlist"] {

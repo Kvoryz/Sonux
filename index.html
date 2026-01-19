@@ -61,15 +61,25 @@
         <button class="control-btn" id="shuffleBtn" title="Shuffle">
           <i class="fas fa-random"></i>
         </button>
-        <button class="control-btn" id="prevBtn" title="Previous">
-          <i class="fas fa-backward"></i>
-        </button>
+        <div class="prev-btn-wrapper">
+          <button class="control-btn" id="prevBtn" title="Previous">
+            <i class="fas fa-backward"></i>
+          </button>
+          <span class="prev-song-tooltip" id="prevSongTooltip"
+            >Previous: --</span
+          >
+        </div>
         <button class="control-btn play-btn" id="playBtn" title="Play/Pause">
           <i class="fas fa-play"></i>
         </button>
-        <button class="control-btn" id="nextBtn" title="Next">
-          <i class="fas fa-forward"></i>
-        </button>
+        <div class="next-btn-wrapper">
+          <button class="control-btn" id="nextBtn" title="Next">
+            <i class="fas fa-forward"></i>
+          </button>
+          <span class="next-song-tooltip" id="nextSongTooltip"
+            >Up next: --</span
+          >
+        </div>
         <button class="control-btn" id="repeatBtn" title="Repeat Off">
           <i class="fas fa-repeat"></i>
         </button>
@@ -167,12 +177,12 @@
     </div>
 
     <!-- Onboarding Tooltips -->
-    <div class="onboarding-tooltip" id="lyricsTooltip" data-target="lyrics">
-      <span>Klik di sini untuk <strong>Lirik</strong></span>
+    <div class="onboarding-tooltip" id="lyricsTooltip" data-target="album">
+      <span>Click to view <strong>Lyrics</strong></span>
       <button class="tooltip-dismiss">&times;</button>
     </div>
     <div class="onboarding-tooltip" id="playlistTooltip" data-target="playlist">
-      <span>Geser untuk <strong>Playlist</strong></span>
+      <span>Hover for <strong>Playlist</strong></span>
       <button class="tooltip-dismiss">&times;</button>
     </div>
 

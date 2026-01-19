@@ -10,11 +10,16 @@ A sleek, immersive web-based music player with Apple Music-inspired aesthetics.
 
 - **Immersive Background** - Dynamic album art blur with gradient overlay
 - **Apple Music Lyrics** - Synced lyrics with blur/glow effects
+- **5-Band Equalizer** - Bass, Low-Mid, Mid, High-Mid, Treble with presets
+- **Queue System** - Right-click to "Play Next" or "Add to Queue"
+- **Gapless Playback** - Seamless transitions between songs
 - **Sleep Timer** - Set timer or stop at end of song
 - **Favorites System** - Save your favorite tracks
 - **Crossfade Playback** - Smooth transitions between songs
 - **Shuffle & Repeat** - Multiple playback modes
+- **Smart Preloading** - LRU cache with adaptive network detection
 - **FAB Menu** - Floating action button for quick controls
+- **Onboarding Tooltips** - First-time user guidance
 - **Responsive Design** - Works on all screen sizes
 
 ## 🚀 Quick Start
@@ -46,14 +51,15 @@ Sonux/
 
 ## 🎛️ Controls
 
-| Key/Action  | Function                                      |
-| ----------- | --------------------------------------------- |
-| Play Button | Play/Pause with fade effect                   |
-| ◀ / ▶       | Previous/Next track                           |
-| 🔀          | Shuffle mode                                  |
-| 🔁          | Repeat (Off → All → One)                      |
-| ❤️          | Add to favorites                              |
-| ⋮           | FAB menu (Stats, Download, Timer, Background) |
+| Key/Action  | Function                                     |
+| ----------- | -------------------------------------------- |
+| Play Button | Play/Pause with fade effect                  |
+| ◀ / ▶       | Previous/Next track                          |
+| 🔀          | Shuffle mode                                 |
+| 🔁          | Repeat (Off → All → One)                     |
+| ❤️          | Add to favorites                             |
+| Right-click | Context menu (Play Next, Add to Queue)       |
+| ⋮           | FAB menu (Stats, Download, Timer, EQ, Queue) |
 
 ## 📝 License
 

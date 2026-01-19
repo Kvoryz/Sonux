@@ -129,6 +129,19 @@
             </div>
           </div>
         </div>
+
+        <!-- Equalizer -->
+        <button class="fab-item" id="eqBtn" title="Equalizer">
+          <i class="fas fa-sliders-h"></i>
+        </button>
+
+        <!-- Queue -->
+        <div class="fab-item-wrapper">
+          <button class="fab-item" id="queueBtn" title="Queue">
+            <i class="fas fa-list-ol"></i>
+            <span class="queue-badge" id="queueBadge">0</span>
+          </button>
+        </div>
       </div>
 
       <!-- Main FAB Toggle -->
@@ -167,6 +180,111 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Equalizer Modal -->
+    <div class="eq-modal" id="eqModal">
+      <div class="eq-modal-content">
+        <div class="eq-header">
+          <h3><i class="fas fa-sliders-h"></i> Equalizer</h3>
+          <button class="eq-close" id="eqClose">&times;</button>
+        </div>
+        <div class="eq-presets">
+          <button class="eq-preset active" data-preset="flat">Flat</button>
+          <button class="eq-preset" data-preset="rock">Rock</button>
+          <button class="eq-preset" data-preset="pop">Pop</button>
+          <button class="eq-preset" data-preset="jazz">Jazz</button>
+          <button class="eq-preset" data-preset="classical">Classical</button>
+        </div>
+        <div class="eq-sliders">
+          <div class="eq-band">
+            <input
+              type="range"
+              class="eq-slider"
+              id="eqBass"
+              min="-12"
+              max="12"
+              value="0"
+              orient="vertical"
+            />
+            <span class="eq-label">Bass</span>
+          </div>
+          <div class="eq-band">
+            <input
+              type="range"
+              class="eq-slider"
+              id="eqLowMid"
+              min="-12"
+              max="12"
+              value="0"
+              orient="vertical"
+            />
+            <span class="eq-label">Low</span>
+          </div>
+          <div class="eq-band">
+            <input
+              type="range"
+              class="eq-slider"
+              id="eqMid"
+              min="-12"
+              max="12"
+              value="0"
+              orient="vertical"
+            />
+            <span class="eq-label">Mid</span>
+          </div>
+          <div class="eq-band">
+            <input
+              type="range"
+              class="eq-slider"
+              id="eqHighMid"
+              min="-12"
+              max="12"
+              value="0"
+              orient="vertical"
+            />
+            <span class="eq-label">High</span>
+          </div>
+          <div class="eq-band">
+            <input
+              type="range"
+              class="eq-slider"
+              id="eqTreble"
+              min="-12"
+              max="12"
+              value="0"
+              orient="vertical"
+            />
+            <span class="eq-label">Treble</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Queue Modal -->
+    <div class="queue-modal" id="queueModal">
+      <div class="queue-modal-content">
+        <div class="queue-header">
+          <h3><i class="fas fa-list-ol"></i> Queue</h3>
+          <div class="queue-actions">
+            <button class="queue-clear" id="queueClear">Clear All</button>
+            <button class="queue-close" id="queueClose">&times;</button>
+          </div>
+        </div>
+        <div class="queue-list" id="queueList">
+          <div class="queue-empty">Queue is empty</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+      <div class="context-item" data-action="playNext">
+        <i class="fas fa-step-forward"></i> Play Next
+      </div>
+      <div class="context-item" data-action="addToQueue">
+        <i class="fas fa-list"></i> Add to Queue
       </div>
     </div>
 

@@ -416,6 +416,8 @@ class MusicPlayer {
     this.setupFavorites();
     this.setupFAB();
     this.setupOnboarding();
+    this.setupEqualizer();
+    this.setupQueue();
     this.renderPlaylist();
     this.updateSongDisplay();
     this.generateShuffledIndices();
@@ -618,6 +620,11 @@ class MusicPlayer {
   }
 
   clearPreloads() {
+    Object.keys(this.preloadAbortControllers).forEach((index) => {
+      this.preloadAbortControllers[index].abort();
+    });
+    this.preloadAbortControllers = {};
+
     Object.values(this.preloadedAudios).forEach((audio) => {
       audio.src = "";
       audio.remove();
@@ -626,6 +633,7 @@ class MusicPlayer {
     this.preloadedAudios = {};
     this.currentlyPreloading = 0;
     this.preloadPriorities = [];
+    this.preloadAccessOrder = [];
 
     document.querySelectorAll(".playlist-item.preloaded").forEach((item) => {
       item.classList.remove("preloaded");
@@ -1019,8 +1027,43 @@ class MusicPlayer {
       this.source = this.audioContext.createMediaElementSource(
         this.audioPlayer,
       );
-      this.source.connect(this.audioContext.destination);
+
+      if (this.currentEQ && !this.eqFiltersInitialized) {
+        this.initEQFiltersInChain();
+      } else {
+        this.source.connect(this.audioContext.destination);
+      }
     }
+  }
+
+  initEQFiltersInChain() {
+    const frequencies = {
+      bass: { freq: 60, type: "lowshelf" },
+      lowMid: { freq: 250, type: "peaking" },
+      mid: { freq: 1000, type: "peaking" },
+      highMid: { freq: 4000, type: "peaking" },
+      treble: { freq: 16000, type: "highshelf" },
+    };
+
+    this.eqFilters = {};
+    let lastNode = this.source;
+
+    Object.entries(frequencies).forEach(([band, config]) => {
+      const filter = this.audioContext.createBiquadFilter();
+      filter.type = config.type;
+      filter.frequency.value = config.freq;
+      filter.gain.value = this.currentEQ ? this.currentEQ[band] || 0 : 0;
+      if (config.type === "peaking") {
+        filter.Q.value = 1;
+      }
+      lastNode.connect(filter);
+      lastNode = filter;
+      this.eqFilters[band] = filter;
+    });
+
+    lastNode.connect(this.audioContext.destination);
+    this.eqFiltersInitialized = true;
+    console.log("🎚️ EQ Filters initialized");
   }
 
   generateShuffledIndices() {
@@ -1193,21 +1236,27 @@ class MusicPlayer {
     const nextTooltip = document.getElementById("nextSongTooltip");
     const prevTooltip = document.getElementById("prevSongTooltip");
 
-    if (!this.playbackOrder || this.playbackOrder.length === 0) return;
-
-    const currentPosInOrder = this.playbackOrder.indexOf(this.currentSongIndex);
-
     if (nextTooltip) {
-      if (this.repeatMode === 1) {
+      if (this.queue && this.queue.length > 0) {
+        const queuedSong = this.songs[this.queue[0]];
+        if (queuedSong) {
+          nextTooltip.textContent = `Up next: ${queuedSong.title} (queued)`;
+        }
+      } else if (this.repeatMode === 1) {
         nextTooltip.textContent = `Up next: ${this.songs[this.currentSongIndex].title}`;
-      } else {
-        const nextPosInOrder =
-          currentPosInOrder < this.playbackOrder.length - 1
-            ? currentPosInOrder + 1
-            : 0;
-        const nextIndex = this.playbackOrder[nextPosInOrder];
-        if (this.songs[nextIndex]) {
-          nextTooltip.textContent = `Up next: ${this.songs[nextIndex].title}`;
+      } else if (this.playbackOrder && this.playbackOrder.length > 0) {
+        const currentPosInOrder = this.playbackOrder.indexOf(
+          this.currentSongIndex,
+        );
+        if (currentPosInOrder !== -1) {
+          const nextPosInOrder =
+            currentPosInOrder < this.playbackOrder.length - 1
+              ? currentPosInOrder + 1
+              : 0;
+          const nextIndex = this.playbackOrder[nextPosInOrder];
+          if (this.songs[nextIndex]) {
+            nextTooltip.textContent = `Up next: ${this.songs[nextIndex].title}`;
+          }
         }
       }
     }
@@ -1215,14 +1264,19 @@ class MusicPlayer {
     if (prevTooltip) {
       if (this.repeatMode === 1) {
         prevTooltip.textContent = `Previous: ${this.songs[this.currentSongIndex].title}`;
-      } else {
-        const prevPosInOrder =
-          currentPosInOrder > 0
-            ? currentPosInOrder - 1
-            : this.playbackOrder.length - 1;
-        const prevIndex = this.playbackOrder[prevPosInOrder];
-        if (this.songs[prevIndex]) {
-          prevTooltip.textContent = `Previous: ${this.songs[prevIndex].title}`;
+      } else if (this.playbackOrder && this.playbackOrder.length > 0) {
+        const currentPosInOrder = this.playbackOrder.indexOf(
+          this.currentSongIndex,
+        );
+        if (currentPosInOrder !== -1) {
+          const prevPosInOrder =
+            currentPosInOrder > 0
+              ? currentPosInOrder - 1
+              : this.playbackOrder.length - 1;
+          const prevIndex = this.playbackOrder[prevPosInOrder];
+          if (this.songs[prevIndex]) {
+            prevTooltip.textContent = `Previous: ${this.songs[prevIndex].title}`;
+          }
         }
       }
     }
@@ -1561,6 +1615,7 @@ class MusicPlayer {
     if (index < 0 || index >= this.songs.length) return;
 
     this.cancelIrrelevantPreloads(index);
+    this.resetGaplessState();
 
     const wasPlaying = this.isPlaying;
     const previousIndex = this.currentSongIndex;
@@ -1823,6 +1878,13 @@ class MusicPlayer {
 
     this.isNextButtonPressed = false;
 
+    const queuedIndex = this.getNextFromQueue();
+    if (queuedIndex !== null) {
+      this.updateQueueBadge();
+      this.selectSong(queuedIndex);
+      return;
+    }
+
     let nextIndex;
 
     if (this.playbackOrder && this.playbackOrder.length > 0) {
@@ -1874,7 +1936,9 @@ class MusicPlayer {
 
     this.playlist.addEventListener("mouseleave", () => {
       this.playlistHovered = false;
-      this.hidePlaylist();
+      if (!this.contextMenuActive) {
+        this.hidePlaylist();
+      }
     });
 
     this.albumArt.addEventListener("click", () => {
@@ -1957,9 +2021,24 @@ class MusicPlayer {
   }
 
   setupAudioEvents() {
+    this.gaplessEnabled = true;
+    this.gaplessPrepared = false;
+
     this.audioPlayer.addEventListener("timeupdate", () => {
       this.updateProgress();
       this.updateActiveLyric();
+
+      if (this.gaplessEnabled && !this.gaplessPrepared) {
+        const timeRemaining =
+          this.audioPlayer.duration - this.audioPlayer.currentTime;
+        if (
+          timeRemaining <= 0.5 &&
+          timeRemaining > 0 &&
+          !isNaN(timeRemaining)
+        ) {
+          this.prepareGaplessTransition();
+        }
+      }
     });
 
     this.audioPlayer.addEventListener("loadedmetadata", () => {
@@ -2019,6 +2098,36 @@ class MusicPlayer {
       this.pause();
       this.durationEl.textContent = "0:00";
     });
+  }
+
+  prepareGaplessTransition() {
+    if (this.repeatMode === 1 || this.sleepAtEndOfSong) return;
+
+    this.gaplessPrepared = true;
+    const nextIndex = this.getNextSongIndex();
+
+    if (nextIndex === null || !this.songs[nextIndex]) {
+      return;
+    }
+
+    if (
+      this.preloadedAudios[nextIndex] &&
+      this.preloadedAudios[nextIndex].readyState >= 3
+    ) {
+      console.log("🎵 Gapless: Next song ready");
+    } else {
+      const nextSong = this.songs[nextIndex];
+      if (!this.gaplessAudio) {
+        this.gaplessAudio = new Audio();
+      }
+      this.gaplessAudio.src = nextSong.src;
+      this.gaplessAudio.preload = "auto";
+      this.gaplessAudio.load();
+    }
+  }
+
+  resetGaplessState() {
+    this.gaplessPrepared = false;
   }
 
   setupSearch() {
@@ -2528,6 +2637,305 @@ class MusicPlayer {
     }, 10000);
   }
 
+  setupEqualizer() {
+    this.eqBtn = document.getElementById("eqBtn");
+    this.eqModal = document.getElementById("eqModal");
+    this.eqClose = document.getElementById("eqClose");
+
+    if (!this.eqBtn || !this.eqModal) return;
+
+    this.eqFilters = {};
+    this.eqPresets = {
+      flat: { bass: 0, lowMid: 0, mid: 0, highMid: 0, treble: 0 },
+      rock: { bass: 4, lowMid: 2, mid: -1, highMid: 3, treble: 4 },
+      pop: { bass: 1, lowMid: 2, mid: 3, highMid: 2, treble: 1 },
+      jazz: { bass: 3, lowMid: 1, mid: 0, highMid: 2, treble: 4 },
+      classical: { bass: 0, lowMid: 0, mid: 0, highMid: 2, treble: 3 },
+    };
+
+    const savedEQ = localStorage.getItem("sonux_eq");
+    this.currentEQ = savedEQ ? JSON.parse(savedEQ) : { ...this.eqPresets.flat };
+
+    this.eqBtn.addEventListener("click", () => {
+      this.eqModal.classList.add("active");
+    });
+
+    this.eqClose.addEventListener("click", () => {
+      this.eqModal.classList.remove("active");
+    });
+
+    this.eqModal.addEventListener("click", (e) => {
+      if (e.target === this.eqModal) {
+        this.eqModal.classList.remove("active");
+      }
+    });
+
+    const sliders = {
+      bass: document.getElementById("eqBass"),
+      lowMid: document.getElementById("eqLowMid"),
+      mid: document.getElementById("eqMid"),
+      highMid: document.getElementById("eqHighMid"),
+      treble: document.getElementById("eqTreble"),
+    };
+
+    Object.entries(sliders).forEach(([band, slider]) => {
+      if (slider) {
+        slider.value = this.currentEQ[band];
+        slider.addEventListener("input", () => {
+          this.currentEQ[band] = parseInt(slider.value);
+          this.applyEqualizer();
+          this.saveEQSettings();
+          this.updatePresetButtons();
+        });
+      }
+    });
+
+    document.querySelectorAll(".eq-preset").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const preset = btn.dataset.preset;
+        if (this.eqPresets[preset]) {
+          this.currentEQ = { ...this.eqPresets[preset] };
+          Object.entries(sliders).forEach(([band, slider]) => {
+            if (slider) slider.value = this.currentEQ[band];
+          });
+          this.applyEqualizer();
+          this.saveEQSettings();
+          this.updatePresetButtons();
+        }
+      });
+    });
+
+    this.updatePresetButtons();
+  }
+
+  setupQueue() {
+    this.queue = [];
+    this.queueBtn = document.getElementById("queueBtn");
+    this.queueBadge = document.getElementById("queueBadge");
+    this.queueModal = document.getElementById("queueModal");
+    this.queueClose = document.getElementById("queueClose");
+    this.queueClear = document.getElementById("queueClear");
+    this.queueList = document.getElementById("queueList");
+    this.contextMenu = document.getElementById("contextMenu");
+    this.contextTargetIndex = null;
+
+    if (!this.queueBtn || !this.queueModal || !this.contextMenu) return;
+
+    this.queueBtn.addEventListener("click", () => {
+      this.queueModal.classList.add("active");
+      this.renderQueue();
+    });
+
+    this.queueClose.addEventListener("click", () => {
+      this.queueModal.classList.remove("active");
+    });
+
+    this.queueModal.addEventListener("click", (e) => {
+      if (e.target === this.queueModal) {
+        this.queueModal.classList.remove("active");
+      }
+    });
+
+    this.queueClear.addEventListener("click", () => {
+      this.queue = [];
+      this.updateQueueBadge();
+      this.renderQueue();
+      this.showToast("fas fa-trash", "Queue cleared");
+    });
+
+    document.querySelectorAll(".context-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const action = item.dataset.action;
+        if (this.contextTargetIndex !== null) {
+          if (action === "playNext") {
+            this.playNext(this.contextTargetIndex);
+          } else if (action === "addToQueue") {
+            this.addToQueue(this.contextTargetIndex);
+          }
+        }
+        this.hideContextMenu();
+      });
+    });
+
+    document.addEventListener("click", () => {
+      this.hideContextMenu();
+    });
+
+    document.addEventListener("contextmenu", (e) => {
+      const playlistItem = e.target.closest(".playlist-item");
+      if (playlistItem) {
+        e.preventDefault();
+        this.contextTargetIndex = parseInt(playlistItem.dataset.index);
+        this.showContextMenu(e.clientX, e.clientY);
+      }
+    });
+  }
+
+  showContextMenu(x, y) {
+    this.contextMenuActive = true;
+    const menu = this.contextMenu;
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.classList.add("active");
+
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) {
+      menu.style.left = `${x - rect.width}px`;
+    }
+    if (rect.bottom > window.innerHeight) {
+      menu.style.top = `${y - rect.height}px`;
+    }
+  }
+
+  hideContextMenu() {
+    this.contextMenuActive = false;
+    this.contextMenu.classList.remove("active");
+  }
+
+  playNext(index) {
+    if (this.queue.includes(index)) {
+      this.queue = this.queue.filter((i) => i !== index);
+    }
+    this.queue.unshift(index);
+    this.updateQueueBadge();
+    const song = this.songs[index];
+    this.showToast("fas fa-step-forward", `Playing next: ${song.title}`);
+  }
+
+  addToQueue(index) {
+    if (!this.queue.includes(index)) {
+      this.queue.push(index);
+      this.updateQueueBadge();
+      const song = this.songs[index];
+      this.showToast("fas fa-list", `Added to queue: ${song.title}`);
+    }
+  }
+
+  removeFromQueue(index) {
+    this.queue = this.queue.filter((i) => i !== index);
+    this.updateQueueBadge();
+    this.renderQueue();
+  }
+
+  updateQueueBadge() {
+    if (this.queue.length > 0) {
+      this.queueBadge.textContent = this.queue.length;
+      this.queueBadge.classList.add("visible");
+    } else {
+      this.queueBadge.classList.remove("visible");
+    }
+    this.updateNextSongTooltip();
+  }
+
+  renderQueue() {
+    if (this.queue.length === 0) {
+      this.queueList.innerHTML =
+        '<div class="queue-empty">Queue is empty</div>';
+      return;
+    }
+
+    this.queueList.innerHTML = this.queue
+      .map((songIndex, i) => {
+        const song = this.songs[songIndex];
+        return `
+          <div class="queue-item" data-queue-index="${i}">
+            <div class="queue-item-art" style="background-image: url('${song.albumArt}')"></div>
+            <div class="queue-item-info">
+              <div class="queue-item-title">${song.title}</div>
+              <div class="queue-item-artist">${song.artist}</div>
+            </div>
+            <button class="queue-item-remove" data-index="${songIndex}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `;
+      })
+      .join("");
+
+    this.queueList.querySelectorAll(".queue-item-remove").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const index = parseInt(btn.dataset.index);
+        this.removeFromQueue(index);
+      });
+    });
+
+    this.queueList.querySelectorAll(".queue-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const queueIndex = parseInt(item.dataset.queueIndex);
+        const songIndex = this.queue[queueIndex];
+        this.queue.splice(0, queueIndex + 1);
+        this.updateQueueBadge();
+        this.selectSong(songIndex);
+        this.queueModal.classList.remove("active");
+      });
+    });
+  }
+
+  getNextFromQueue() {
+    if (this.queue.length > 0) {
+      return this.queue.shift();
+    }
+    return null;
+  }
+
+  initEQFilters() {
+    if (!this.audioContext || this.eqFiltersInitialized) return;
+
+    const frequencies = {
+      bass: { freq: 60, type: "lowshelf" },
+      lowMid: { freq: 250, type: "peaking" },
+      mid: { freq: 1000, type: "peaking" },
+      highMid: { freq: 4000, type: "peaking" },
+      treble: { freq: 16000, type: "highshelf" },
+    };
+
+    let lastNode = this.audioContext.createGain();
+    this.audioSource.disconnect();
+    this.audioSource.connect(lastNode);
+
+    Object.entries(frequencies).forEach(([band, config]) => {
+      const filter = this.audioContext.createBiquadFilter();
+      filter.type = config.type;
+      filter.frequency.value = config.freq;
+      filter.gain.value = this.currentEQ[band] || 0;
+      if (config.type === "peaking") {
+        filter.Q.value = 1;
+      }
+      lastNode.connect(filter);
+      lastNode = filter;
+      this.eqFilters[band] = filter;
+    });
+
+    lastNode.connect(this.analyser);
+    this.eqFiltersInitialized = true;
+  }
+
+  applyEqualizer() {
+    if (!this.eqFilters) return;
+
+    Object.entries(this.currentEQ).forEach(([band, gain]) => {
+      if (this.eqFilters[band]) {
+        this.eqFilters[band].gain.value = gain;
+      }
+    });
+  }
+
+  saveEQSettings() {
+    localStorage.setItem("sonux_eq", JSON.stringify(this.currentEQ));
+  }
+
+  updatePresetButtons() {
+    document.querySelectorAll(".eq-preset").forEach((btn) => {
+      const preset = btn.dataset.preset;
+      const presetValues = this.eqPresets[preset];
+      const isMatch = Object.entries(presetValues).every(
+        ([band, value]) => this.currentEQ[band] === value,
+      );
+      btn.classList.toggle("active", isMatch);
+    });
+  }
+
   toggleFavorite() {
     const song = this.songs[this.currentSongIndex];
     if (!song) return;
@@ -2594,6 +3002,11 @@ class MusicPlayer {
       const currentPosInOrder = this.playbackOrder.indexOf(
         this.currentSongIndex,
       );
+      if (currentPosInOrder === -1) {
+        return this.currentSongIndex < this.songs.length - 1
+          ? this.currentSongIndex + 1
+          : 0;
+      }
       const nextPosInOrder =
         currentPosInOrder < this.playbackOrder.length - 1
           ? currentPosInOrder + 1
@@ -2613,6 +3026,11 @@ class MusicPlayer {
       const currentPosInOrder = this.playbackOrder.indexOf(
         this.currentSongIndex,
       );
+      if (currentPosInOrder === -1) {
+        return this.currentSongIndex > 0
+          ? this.currentSongIndex - 1
+          : this.songs.length - 1;
+      }
       const prevPosInOrder =
         currentPosInOrder > 0
           ? currentPosInOrder - 1

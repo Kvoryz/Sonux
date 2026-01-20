@@ -2605,19 +2605,32 @@ class MusicPlayer {
   setupFAB() {
     const fabContainer = document.getElementById("fabContainer");
     const fabToggle = document.getElementById("fabToggle");
+    const fabCheckbox = document.getElementById("fabCheckbox");
 
     if (!fabContainer || !fabToggle) return;
 
-    fabToggle.addEventListener("click", (e) => {
-      e.stopPropagation();
-      fabContainer.classList.toggle("open");
-      fabToggle.classList.toggle("active");
-    });
+    if (fabCheckbox) {
+      fabCheckbox.addEventListener("change", (e) => {
+        e.stopPropagation();
+        const isOpen = fabCheckbox.checked;
+        fabContainer.classList.toggle("open", isOpen);
+        fabToggle.classList.toggle("active", isOpen);
+      });
+    } else {
+      fabToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fabContainer.classList.toggle("open");
+        fabToggle.classList.toggle("active");
+      });
+    }
 
     document.addEventListener("click", (e) => {
       if (!fabContainer.contains(e.target)) {
         fabContainer.classList.remove("open");
         fabToggle.classList.remove("active");
+        if (fabCheckbox) {
+          fabCheckbox.checked = false;
+        }
       }
     });
   }

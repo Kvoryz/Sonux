@@ -942,6 +942,16 @@ class MusicPlayer {
           c3 = addTint(c3, [20, 10, 5]);
         }
 
+        // Remove aurora elements if they exist
+        const auroraContainer = document.getElementById("auroraContainer");
+        if (auroraContainer) auroraContainer.remove();
+        const auroraVignette = document.getElementById("auroraVignette");
+        if (auroraVignette) auroraVignette.remove();
+        const orbContainer = document.getElementById("albumOrbContainer");
+        if (orbContainer) orbContainer.remove();
+        const darkOverlay = document.getElementById("albumDarkOverlay");
+        if (darkOverlay) darkOverlay.remove();
+
         this.backgroundBlur.style.transition =
           "background-image 1.5s ease-in-out, filter 1s ease-in-out";
         this.backgroundBlur.style.backgroundImage = `url('${albumArtUrl}')`;
@@ -1463,7 +1473,10 @@ class MusicPlayer {
   updateActiveLyric() {
     if (!this.lyricsActive) return;
 
-    const currentTime = this.audioPlayer.currentTime;
+    let currentTime = this.audioPlayer.currentTime;
+    if (this.isCrossfading && this.crossfadeAudio) {
+      currentTime = this.crossfadeAudio.currentTime;
+    }
 
     const lyrics = this.currentLyrics;
 

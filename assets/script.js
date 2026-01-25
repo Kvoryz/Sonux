@@ -1293,7 +1293,6 @@ class MusicPlayer {
   }
 
   async updateLyricsDisplay() {
-    this.lyricsContent.style.opacity = "0";
     this.lyricsContent.innerHTML = "";
     const song = this.songs[this.currentSongIndex];
 
@@ -1301,6 +1300,7 @@ class MusicPlayer {
     loadingEl.className = "no-lyrics-message";
     loadingEl.textContent = "Loading lyrics...";
     this.lyricsContent.appendChild(loadingEl);
+    this.lyricsContent.style.opacity = "1";
 
     let lyrics = null;
     if (song.lyricsKey && typeof lrcLoader !== "undefined") {
